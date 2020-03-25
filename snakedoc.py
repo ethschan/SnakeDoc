@@ -89,6 +89,7 @@ class Variable:
     String  _description  description of the variable
     String  _inital_value  the inital value set to the variable
     Functions[]  _usage  functions the variable is used in
+    int  _pointer_depth  the pointer depth of the variable
   """
   def __init__(self):
     self._dataType = ""
@@ -96,6 +97,7 @@ class Variable:
     self._description = ""
     self._usage = []
     self._inital_value = ""
+    self._pointer_depth = 0
 
   def setDataType(self, dataType):
      self._dataType = dataType
@@ -108,6 +110,9 @@ class Variable:
       
   def setInitalValue(self, inital_value):
       self._inital_value = inital_value
+      
+  def setPointerDepth(self, pointer_depth):
+      self._pointer_depth = pointer_depth
       
   def getDataType(self):
     return self._dataType
@@ -123,12 +128,16 @@ class Variable:
   
   def getInitalValue(self):
       return self._inital_value
+  
+  def getPointerDepth(self):
+      return self._pointer_depth
     
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   usage = property(getUsage)
   inital_value = property(getInitalValue, setInitalValue)
+  pointer_depth = property(getPointerDepth, setPointerDepth)
       
    
 """
@@ -407,6 +416,7 @@ def printVariable(v):
     print("Inital Value: " + v.inital_value)
     print("Type: " + v.dataType)
     print("Description: " + v.description) 
+    print("Pointer depth: " + str(v.pointer_depth))
     print()
 
   
@@ -529,6 +539,7 @@ def harvestConstant(line):
       new_constant.dataType = "int"
   else:
       new_constant.dataType = "keyword"
+      
 
   documentedConstants.append(new_constant)
 
@@ -596,9 +607,11 @@ def harvestVariable(line):
       pointerAsteriskLine = line[0:body_right_index+1]
       asteriskCount += pointerAsteriskLine.count("*")
       bodyLine = pointerAsteriskLine.replace("*", "")
-      new_variable.name = bodyLine[findN(bodyLine, "(", 1)+1:findN(bodyLine, ")", 1)]
+      new_variable.name = bodyLine[findN(bodyLine, "(", 1)+1:findN(bodyLine, ")", 1)].replace(" ", "")
       new_variable.dataType = line[pointer_left_index:parameter_right_index+1].replace(" ", "").replace(new_variable.name, "")
   
+  new_variable._pointer_depth = asteriskCount
+    
   #collect inital value
   if equals_index != -1 and equals_index < semicolon_index:
       inital_value_left_index = searchForChar(line, " ", 1, equals_index+1, False)
