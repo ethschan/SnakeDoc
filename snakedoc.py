@@ -2,6 +2,7 @@
 
 #Import Statements
 import sys
+import re
 
 path = ""
 validExtensions = ["ino", "cpp", "INO", "CPP"]
@@ -131,6 +132,24 @@ class Variable:
   
   def getPointerDepth(self):
       return self._pointer_depth
+      
+  """
+  Function Name:
+      
+    toString
+    
+  Description:
+  
+  	Prints out the current instance of a Variable object to the command line for debugging.
+  """
+  def toString(self):
+      print("Name: " + self.name)
+      print("Inital Value: " + self.inital_value)
+      print("Type: " + self.dataType)
+      print("Description: " + self.description) 
+      print("Pointer depth: " + str(self.pointer_depth))
+      print()
+
     
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
@@ -170,6 +189,7 @@ class Constant:
     String  _description  description of the constant
     Functions[]  _usage  functions the variable is used in
     String  _value  the value of the constant
+    String  _code  the plain text code
   """
   def __init__(self):
     self._dataType = ""
@@ -177,6 +197,7 @@ class Constant:
     self._description = ""
     self._usage = []
     self._value = ""
+    self._code = ""
 
   def setDataType(self, dataType):
      self._dataType = dataType
@@ -189,6 +210,9 @@ class Constant:
       
   def setValue(self, value):
     self._value = value
+    
+  def setCode(self, code):
+    self._code = code
       
   def getDataType(self):
     return self._dataType
@@ -201,11 +225,33 @@ class Constant:
 
   def getValue(self):
      return self._value
+	
+  def getCode(self):
+      return self._code
+     
+  """
+  Function Name:
+      
+    toString
+    
+  Description:
+  
+  	Prints out the current instance of the Constant object to the command line for debugging.
+  """
+  def toString(self):
+    print("Name: " + self._name)
+    print("Value: " + self._value)
+    print("Type: " + self._dataType)
+    print("Description: " + self._description) 
+    print("Usage: ")
+    print(self._usage)
+    print()
     
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   value = property(getValue, setValue)
+  code = property(getCode, setCode)
       
    
 """
@@ -365,8 +411,6 @@ def isVariableDeclaration(line):
   	Checks if the given line is a constant declaration
     
   Parameters:
-      
-      
   
   	String  line  the line to check
     
@@ -379,51 +423,13 @@ def isConstantDeclaration(line):
         return True
     return False
 
-"""
-  Function Name:
-      
-    printConstant
     
-  Description:
-  
-  	Prints out an instance of a Constant object to the command line for debugging.
-    
-  Parameters:
-  
-  	Constant  c  the constant to print out
-"""
-def printConstant(c):
-    print("Name: " + c.name)
-    print("Value: " + c.value)
-    print("Type: " + c.dataType)
-    print("Description: " + c.description) 
-    
-"""
-  Function Name:
-      
-    printVariable
-    
-  Description:
-  
-  	Prints out an instance of a Constant object to the command line for debugging.
-    
-  Parameters:
-  
-  	Variable  v  the variable to print out
-"""
-def printVariable(v):
-    print("Name: " + v.name)
-    print("Inital Value: " + v.inital_value)
-    print("Type: " + v.dataType)
-    print("Description: " + v.description) 
-    print("Pointer depth: " + str(v.pointer_depth))
-    print()
 
   
 """
     Function Name:
         
-        searchForChar
+    	searchForChar
         
     Description:
         
@@ -432,7 +438,7 @@ def printVariable(v):
         
     Parameters:
         
-        String  s  the string to search for given character
+        String  string  the string to search for given character
         char  char  the char to search for the presence or absence of
         int  increment  the increment to change each time (1 to search left by 1, -1 to search right by 1)
         int  startIndex  the index to start from while searching
@@ -442,20 +448,62 @@ def printVariable(v):
         
         int  index  the index the request is found at in the given String, if there is an error or the character is not found -1
 """
-def searchForChar(s, char, increment, startIndex, presence):
-    if startIndex < 0 or startIndex >= len(s):
+def searchForChar(string, char, increment, startIndex, presence):
+    if startIndex < 0 or startIndex >= len(string):
         return -1
     i = 0
-    while startIndex+(i*increment) >= 0 and startIndex+(i*increment) < len(s):
-        if presence:
-            if s[startIndex+(i*increment)] == char:
+    if presence:
+        while startIndex+(i*increment) >= 0 and startIndex+(i*increment) < len(string):	
+            if string[startIndex+(i*increment)] == char:
                 return startIndex+(i*increment)
-        else:
-            if s[startIndex+(i*increment)] != char:
+            i += 1
+    else:
+    	while startIndex+(i*increment) >= 0 and startIndex+(i*increment) < len(string):
+            if string[startIndex+(i*increment)] != char:
                 return startIndex+(i*increment)
-        i += 1
+            i += 1
     return -1
+   
+"""
+  Function Name:
+  
+  	isFunctionHeader
+
+	Description:
+  
+  	Checks if the given line is the start of a function header by looking for "Function Name:"
     
+  Parameters:
+  
+  	String  line  the line to check
+    
+  Returns:
+  
+  	boolean  isFunctionHeader  returns True if line contains the start of a function header, returns False otherwise
+"""          
+def isFunctionHeader(line):
+    #if re.search("^*Function Name: *\n", line):
+    #    return True
+    return False
+    
+               
+"""
+  Function Name:
+  
+  	harvestFunction
+
+  Description:
+  
+  	Harvests function declaration and its header into a function object form then appends to global list of functions
+    
+  Parameters:
+  
+  	String  line  the line with the constant declaration to harvest
+"""                  
+def harvestFunction(line):
+	pass
+                  
+                  
 """
   Function Name:
   
@@ -477,18 +525,22 @@ def harvestConstant(line):
   first_space_index = findN(line, " ", 1)
   second_space_index = findN(line, " ", 2)
   comment_index = findN(line, "//", 1)
+    
   #check for an unformed file, this check should be expanded for more context then single space delimiters for arguments
   if first_space_index == -1 or second_space_index == -1 or (comment_index != -1 and comment_index < second_space_index):
       unformedSyntaxHandler()
-  
+
   #harvest value by searching from left of comment to first character, then searching for whitespace
   value_right_index = -1
+        
   if comment_index != -1:
       value_right_index = searchForChar(line, " ", -1, comment_index-1, False)
   else:
       value_right_index = searchForChar(line, " ", -1, len(line)-2, False)
       
   value_left_index = searchForChar(line, " ", -1, value_right_index, True)
+        
+  #now that we know the indexs we can harvest the value
   new_constant.value = line[value_left_index+1:value_right_index+1]
   
   name_right_index = searchForChar(line, " ", -1, value_left_index-1, False)
@@ -580,6 +632,7 @@ def harvestVariable(line):
           
   asteriskCount = 0
   name_right_index = -1
+            
   
   if equals_index != -1 and equals_index < semicolon_index:
       name_right_index = searchForChar(line, " ", -1, equals_index-1, False)
@@ -589,6 +642,8 @@ def harvestVariable(line):
   name_left_index = searchForChar(line, " ", -1, name_right_index, True)
   tempName = line[name_left_index+1:name_right_index+1]
   
+  #void (*foo)(int);     //wow
+        
   #function pointer check
   if ")" not in tempName:
       asteriskCount += tempName.count("*")
@@ -625,7 +680,7 @@ def harvestVariable(line):
 """
 ***************************************************************
 
-									 		START OF PROGRAM
+						START OF PROGRAM
 
 ***************************************************************  
 """       
@@ -665,16 +720,13 @@ while True:
     currentLine = file.readline()
     if currentLine == "":
         break
-    elif "/*" in currentLine:
+    elif isFunctionHeader(currentLine):
         harvestHeader()
     elif isVariableDeclaration(currentLine):
         harvestVariable(currentLine)
     elif isConstantDeclaration(currentLine):
         harvestConstant(currentLine)
         
-for var in documentedVariables:
-    printVariable(var)
-    
 
 #create a list of html indexs (www.google.com/home/funcname, www.google.com/home/2, www.google.com/home/3)
 
