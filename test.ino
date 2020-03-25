@@ -16,3 +16,23 @@ double *** * ** ** ** * * maxProx; //maxProx  maximum proximity to thresholds to
 #define  xSmoothing 5   //the number of points that are averaged together when processing the signal
 #define   maxConsec   50 //the number of times the average signal value must be at voltMin to indicate full activation
 void *(*foo)(int *); //wow
+
+
+
+/*
+* Function Name:
+*
+*   testHeader
+*
+* Description:
+*
+*   testy testy, pleasd work so I can resty
+*
+* Parameters:
+*
+*   N/A
+*
+* Returns:
+*
+*   N/A
+*/
