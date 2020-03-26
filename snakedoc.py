@@ -4,9 +4,10 @@
 import sys
 import re
 
+
 path = ""
 validExtensions = ["ino", "cpp", "INO", "CPP"]
-variableDeclarationTypes = ["double", "int", "String", "bool", "float", "char", "Integer", "long", "unsigned", "Integer", "void", "string"]
+variableDeclarationTypes = ["double", "int", "String", "bool", "float", "char", "Integer", "long", "unsigned", "void", "string", "File"]
 documentedConstants = []
 documentedVariables = []
 documentedFunctions = []
@@ -49,13 +50,18 @@ class Library:
     self._name = name
 
   def setDescription(self, description):
-     self._desription = description
+     self._description = description
 
   def getName(self):
     return self._name
 
   def getDescription(self):
      return self._description
+
+  def toString(self):
+	  print("Name: " + self._name)
+	  print("Description: " + self._description)
+	  print()
 
   name = property(getName, setName)
   description = property(getDescription, setDescription)
@@ -98,7 +104,7 @@ class Variable:
     self._name = ""
     self._description = ""
     self._usage = []
-    self._inital_value = ""
+    self._inital_value = "null"
     self._pointer_depth = 0
 
   def setDataType(self, dataType):
@@ -144,11 +150,11 @@ class Variable:
   	Prints out the current instance of a Variable object to the command line for debugging.
   """
   def toString(self):
-      print("Name: " + self.name)
-      print("Inital Value: " + self.inital_value)
-      print("Type: " + self.dataType)
-      print("Description: " + self.description)
-      print("Pointer depth: " + str(self.pointer_depth))
+      print("Name: " + self._name)
+      print("Inital Value: " + self._inital_value)
+      print("Type: " + self._dataType)
+      print("Description: " + self._description)
+      print("Pointer depth: " + str(self._pointer_depth))
       print()
 
 
@@ -284,42 +290,75 @@ class Function:
     String  description  description of the function usage
     Variable[]  parameters  parameters of the function
     Variable  returnValue  return value of the function
+	Variable[]  variables  the global variables manipulated by the function
+	Functions[]  functionCalls  the functions the function calls
+	String  code  the plain text code of the function
   """
   def __init__(self):
-    self._name = ""
-    self._description = ""
-    self._parameters = []
-    self._returnValue = Variable()
+	  self._description = ""
+	  self._parameters = []
+	  self._returnValue = None
+	  self._variables = []
+	  self.functionCalls = []
+	  self.code = ""
+	  self._name = ""
 
   def setName(self, name):
-    self._name = name
+      self._name = name
+
+  def setCode(self, code):
+      self._code = code
 
   def setDescription(self, description):
-     self._desription = description
+      self._description = description
 
   def appendParameter(self, parameter):
-    self._parameters.append(parameter)
+      self._parameters.append(parameter)
 
   def setReturnValue(self, returnValue):
-    self._returnValue = returnValue
+      self._returnValue = returnValue
 
   def getName(self):
-    return self._name
+      return self._name
 
   def getDescription(self):
-     return self._description
+      return self._description
 
   def getParameters(self):
-    return self._parameters
+      return self._parameters
 
   def getReturnValue(self):
-    return self._returnValue
+      return self._returnValue
+
+  def getCode(self):
+      return self._code
+
+  def toString(self):
+	  print("========================================")
+	  print()
+	  print("Name: " + str(self._name) + "\n")
+	  print("Description:")
+	  print(self._description + "\n")
+	  print("Parameters:")
+	  for parameter in self._parameters:
+		  parameter.toString()
+		  print()
+	  print("\nReturn value:")
+	  if self._returnValue != None:
+	         self._returnValue.toString()
+	  print()
+	  print("Code:")
+	  print(self._code)
+	  print("\n========================================\n")
+
 
 
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   parameters = property(getParameters)
   returnValue = property(getReturnValue, setReturnValue)
+  code = property(getCode, setCode)
+
 
 """
   Function Name:
@@ -487,6 +526,28 @@ def isFunctionHeader(line):
         return True
     return False
 
+"""
+  Function Name:
+
+  	isLibraryImport
+
+	Description:
+
+  	Checks if the given line is a libary import statement
+
+  Parameters:
+
+  	String  line  the line to check
+
+  Returns:
+
+  	boolean  isLibraryImport  returns True if line contains a library import statement, returns False otherwise
+"""
+def isLibraryImport(line):
+    if re.search("^.*#include", line):
+        return True
+    return False
+
 
 """
 Function Name:
@@ -498,15 +559,120 @@ Description:
   	skips lines until it encounters a line that doens't contain solely asterisks, spaces, and new line characters
 
 """
-def skipBlankLine ():
+def skipBlankLine():
     global currentLineIndex
     while True:
         line = file.readline()
         currentLineIndex += 1
-        if not re.search("(\w)", line):
+        if not re.search("(\w)", line) and not re.search("(\*\/)", line):
             continue
         else:
             return line
+
+"""
+Function Name:
+
+  	descriptionScraper
+
+Description:
+
+  	Scrapes the description section of a function header after encountering the "Description:" header
+
+Parameters:
+
+	Function  new_function  takes in a  function to set the harvested description to
+
+Returns:
+
+	String  line  return the last line read triggering exit
+
+"""
+def descriptionScraper(new_function):
+	description = ""
+	line = skipBlankLine()
+	while True:
+		if re.search(".*Parameters: *\n", line) or re.search(".*Returns: *\n", line) or re.search("(\*\/)", line):
+			break
+		elif re.search("^.*Description: *\n", line) or re.search("^.*Function Name: *\n", line):
+			unformedSyntaxHandler()
+		else:
+			description += re.search("([ *]*)([\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() <>]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()<>])( *\n)",  line, re.I | re.U).group(2) + "\n"
+		line = skipBlankLine()
+	if description.endswith("\n"):
+		description = description[:-1]
+	new_function.description = description
+	return line
+
+"""
+Function Name:
+
+  	parameterScraper
+
+Description:
+
+  	Scrapes the parameters section of a function header after encountering the "Parameter:" header
+
+Parameters:
+
+	Function  new_function  takes in a  function to store the harvested parameters in
+
+Returns:
+
+	String  line  return the last line read triggering exit
+
+"""
+def parameterScraper(new_function):
+	line = skipBlankLine()
+	while True:
+		if  re.search(".*Returns: *\n", line) or re.search("(\*\/)", line) or re.search("([ *]*)(N\/A) *\n", line):
+			break
+		else:
+			new_variable = Variable()
+			groups  = re.search("([ *]*)([\w*]*)([ ]*)([\w]*)([ ]*)([\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() <>]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()<>])( *\n)",  line, re.I | re.U)
+			new_variable.description = groups.group(6)
+			new_variable.name = groups.group(4)
+			new_variable.dataType = groups.group(2)
+			new_variable.pointer_depth = new_variable.dataType.count("*")
+			new_variable.dataType = new_variable.dataType.replace("*", "")
+			new_function.appendParameter(new_variable)
+		line = skipBlankLine()
+	return line
+
+"""
+Function Name:
+
+  	returnScraper
+
+Description:
+
+  	Scrapes the return section of a function header after encountering the "Returns:" header
+
+Parameters:
+
+	Function  new_function  takes in a  function to store the harvested return information in
+
+Returns:
+
+	String  line  return the last line read triggering exit
+
+"""
+def returnScraper(new_function):
+	line = skipBlankLine()
+	while True:
+		if  re.search(".*Parameters: *\n", line) or re.search("(\*\/)", line) or re.search("([ *]*)(N\/A) *\n", line):
+			break
+		else:
+			new_variable = Variable()
+			groups  = re.search("([ *]*)([\w*]*)([ ]*)([\w]*)([ ]*)([\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() ]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()])( *\n)",  line, re.I | re.U)
+			new_variable.description = groups.group(6)
+			new_variable.name = groups.group(4)
+			new_variable.dataType = groups.group(2)
+			new_variable.pointer_depth = new_variable.dataType.count("*")
+			new_variable.dataType = new_variable.dataType.replace("*", "")
+			new_function.returnValue = new_variable
+		line = skipBlankLine()
+	return line
+
 """
   Function Name:
 
@@ -516,21 +682,92 @@ def skipBlankLine ():
 
   	Harvests function declaration and its header into a function object form then appends to global list of functions
 
+"""
+def harvestFunction():
+	global currentLineIndex
+	new_function = Function()
+	#keep going until we find a non-blank line (has the function name)
+	line = skipBlankLine()
+
+	if re.search("^.*Description: *\n", line):
+		unformedSyntaxHandler()
+
+	#harvest function name from line
+	new_function.name = re.sub("(\W)", "",  line)
+	#keep going until we encounter another field, (description field)
+	line = skipBlankLine()
+
+
+	#check if field is description field
+	if re.search("^.*Description: *\n", line):
+		line = descriptionScraper(new_function)
+	else:
+		#couldn't find description header
+		unformedSyntaxHandler()
+
+	headingsHarvestedCount = 0
+
+	while headingsHarvestedCount < 2:
+		if re.search(".*Parameters: *\n", line):
+			line = parameterScraper(new_function)
+		elif re.search(".*Returns: *\n", line):
+			line = returnScraper(new_function)
+		elif re.search("([ *]*)(N\/A) *\n", line):
+			line = skipBlankLine()
+			headingsHarvestedCount -= 1
+		elif re.search("(\*\/)", line):
+			#done harvesting the function header
+			break
+		headingsHarvestedCount += 1
+
+	if not re.search("(\*\/)", line):
+		line = skipBlankLine()
+		if not re.search("(\*\/)", line):
+			unformedSyntaxHandler()
+
+	line = skipBlankLine()
+
+	code = ""
+
+	opening_curly_count = line.count("{")
+	closing_curly_count = line.count("}")
+	code = line
+
+	while opening_curly_count >= 1 and opening_curly_count != closing_curly_count:
+		line = file.readline()
+		currentLineIndex += 1
+		opening_curly_count += line.count("{")
+		closing_curly_count += line.count("}")
+		code += line
+
+	new_function.code = code
+
+	documentedFunctions.append(new_function)
+
+
+	new_function.toString()
+
+
+"""
+  Function Name:
+
+  	harvestLibraryImport
+
+  Description:
+
+  	Harvests a library import statement then appends the newly created object to a global list
+
   Parameters:
 
-  	String  line  the line with the constant declaration to harvest
+  	String  line  the line with the library import to harvest
 """
-def harvestFunction(line):
-    function = Function()
-    line = skipBlankLine()
-    function.name = re.sub("(\W)", "",  line)
-    print (function.name)
-    line = skipBlankLine()
+def harvestLibraryImport(line):
+	new_library = Library()
+	groups = re.search("( *)(#include)( *)([<\"\'][\w.\"\']*[\"\'>])( *)(\/\/)([\w ]*[\w ])( *\n)",  line, re.I | re.U)
+	new_library.name = groups.group(4)
+	new_library.description = groups.group(7)
+	new_library.toString()
 
-    if re.search("^.*Description: *\n", line):
-        line = skipBlankLine()
-        function.description = re.sub("([^\w \n])", "",  line)
-        print (function.description)
 """
   Function Name:
 
@@ -743,19 +980,20 @@ except OSError:
     	#record any data in variables setup before loop
     	#return back to looking for patterns
 while True:
-    currentLineIndex += 1
-    currentLine = file.readline()
-    if currentLine == "":
-        break
-    elif isFunctionHeader(currentLine):
-        harvestFunction(currentLine)
-    elif isVariableDeclaration(currentLine):
-        harvestVariable(currentLine)
-    elif isConstantDeclaration(currentLine):
-        harvestConstant(currentLine)
+	currentLineIndex += 1
+	currentLine = file.readline()
+	if currentLine == "":
+		break
+	elif isFunctionHeader(currentLine):
+		harvestFunction()
+	elif isVariableDeclaration(currentLine):
+		harvestVariable(currentLine)
+	elif isConstantDeclaration(currentLine):
+		harvestConstant(currentLine)
+	elif isLibraryImport(currentLine):
+		harvestLibraryImport(currentLine)
 
-for var in documentedVariables:
-    var.toString()
+
 
 #create a list of html indexs (www.google.com/home/funcname, www.google.com/home/2, www.google.com/home/3)
 
