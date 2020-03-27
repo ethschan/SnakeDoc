@@ -22,7 +22,7 @@ CLASS NAME:
 
 DESCRIPTION:
 
-  Object that repersents an imported library with the name of the imported file and description of usage in the program
+  Object that repersents an imported library statement
 
 ***************************************************************
 """
@@ -40,11 +40,13 @@ class Library:
   Variables:
 
   	String  name  the name of the imported library
-   String  description  description of usage in the program
+    String  description  description of usage in the program
+    String  code  the plain text code of the library import statement
   """
   def __init__(self):
     self._name = ""
     self._description = ""
+    self._code = ""
 
   def setName(self, name):
     self._name = name
@@ -52,19 +54,36 @@ class Library:
   def setDescription(self, description):
      self._description = description
 
+  def setCode(self, code):
+      self._code = code
+
   def getName(self):
     return self._name
 
   def getDescription(self):
      return self._description
 
+  def getCode(self):
+      return self._code
+
+  """
+  Function Name:
+
+    toString
+
+  Description:
+
+  	Prints out the current instance of a Library object to the command line for debugging.
+  """
   def toString(self):
-	  print("Name: " + self._name)
-	  print("Description: " + self._description)
-	  print()
+      print("Name: " + self._name)
+      print("Description: " + self._description)
+      print("Code: " + self._code)
+      print()
 
   name = property(getName, setName)
   description = property(getDescription, setDescription)
+  code = property(getCode, setCode)
 
 
 """
@@ -75,7 +94,7 @@ CLASS NAME:
 
 DESCRIPTION:
 
-	object for containg details about variables throughout the program
+  Object that repersents a variable declared in a program
 
 ***************************************************************
 """
@@ -98,6 +117,7 @@ class Variable:
     String  _inital_value  the inital value set to the variable
     Functions[]  _usage  functions the variable is used in
     int  _pointer_depth  the pointer depth of the variable
+    String  code  the plain text code of the variable declaration
   """
   def __init__(self):
     self._dataType = ""
@@ -106,6 +126,7 @@ class Variable:
     self._usage = []
     self._inital_value = "null"
     self._pointer_depth = 0
+    self._code = ""
 
   def setDataType(self, dataType):
      self._dataType = dataType
@@ -121,6 +142,12 @@ class Variable:
 
   def setPointerDepth(self, pointer_depth):
       self._pointer_depth = pointer_depth
+
+  def setCode(self, code):
+      self._code = code
+
+  def appendUsage(self, function):
+      self._usage.append(function)
 
   def getDataType(self):
     return self._dataType
@@ -140,6 +167,9 @@ class Variable:
   def getPointerDepth(self):
       return self._pointer_depth
 
+  def getCode(self):
+      return self._code
+
   """
   Function Name:
 
@@ -155,6 +185,9 @@ class Variable:
       print("Type: " + self._dataType)
       print("Description: " + self._description)
       print("Pointer depth: " + str(self._pointer_depth))
+      print("Used in:")
+      for function in self._usage:
+          print(function.name)
       print()
 
 
@@ -164,6 +197,7 @@ class Variable:
   usage = property(getUsage)
   inital_value = property(getInitalValue, setInitalValue)
   pointer_depth = property(getPointerDepth, setPointerDepth)
+  code = property(getCode, setCode)
 
 
 """
@@ -221,6 +255,9 @@ class Constant:
   def setCode(self, code):
     self._code = code
 
+  def appendUsage(self, function):
+    self._usage.append(function)
+
   def getDataType(self):
     return self._dataType
 
@@ -236,6 +273,9 @@ class Constant:
   def getCode(self):
       return self._code
 
+  def getUsage(self):
+      return self._usage
+
   """
   Function Name:
 
@@ -243,7 +283,7 @@ class Constant:
 
   Description:
 
-  	Prints out the current instance of the Constant object to the command line for debugging.
+  	Prints out the current instance of the Constant object to the command line for debugging
   """
   def toString(self):
     print("Name: " + self._name)
@@ -251,7 +291,8 @@ class Constant:
     print("Type: " + self._dataType)
     print("Description: " + self._description)
     print("Usage: ")
-    print(self._usage)
+    for function in self._usage:
+        print(function.name)
     print()
 
   dataType = property(getDataType, setDataType)
@@ -259,6 +300,7 @@ class Constant:
   description = property(getDescription, setDescription)
   value = property(getValue, setValue)
   code = property(getCode, setCode)
+  usage = property(getUsage)
 
 
 """
@@ -269,7 +311,7 @@ CLASS NAME:
 
 DESCRIPTION:
 
-	object for containg details about functions throughout the program
+	Object repersenting a Function
 
 ***************************************************************
 """
@@ -286,25 +328,28 @@ class Function:
 
   Variables:
 
-  	String  name  name of the function
+  	String  +name  name of the function
     String  description  description of the function usage
     Variable[]  parameters  parameters of the function
     Variable  returnValue  return value of the function
 	Variable[]  variables  the global variables manipulated by the function
 	Functions[]  functionCalls  the functions the function calls
 	String  code  the plain text code of the function
+    String  subDirectoryPath  the url path assigned to the function page
   """
   def __init__(self):
-	  self._description = ""
-	  self._parameters = []
-	  self._returnValue = None
-	  self._variables = []
-	  self.functionCalls = []
-	  self.code = ""
-	  self._name = ""
+      self._description = ""
+      self._parameters = []
+      self._return_value = None
+      self._variables = []
+      self._function_calls = []
+      self._code = ""
+      self._name = ""
+      self._subdirectory_path = ""
 
   def setName(self, name):
       self._name = name
+      self._subdirectory_path = "/functions/" + name
 
   def setCode(self, code):
       self._code = code
@@ -316,7 +361,13 @@ class Function:
       self._parameters.append(parameter)
 
   def setReturnValue(self, returnValue):
-      self._returnValue = returnValue
+      self._return_value = returnValue
+
+  def appendFunctionCall(self, function):
+      self._function_calls.append(function)
+
+  def appendVariable(self, variable):
+      self._variables.append(variable)
 
   def getName(self):
       return self._name
@@ -328,36 +379,59 @@ class Function:
       return self._parameters
 
   def getReturnValue(self):
-      return self._returnValue
+      return self._return_value
 
   def getCode(self):
       return self._code
 
+  def getFunctionCalls(self):
+      return self._function_calls
+
+  def getVariables(self):
+      return self._variables
+
+  def getSubdirectoryPath(self):
+      return self._subdirectory_path
+
+  """
+  Function Name:
+
+    toString
+
+  Description:
+
+  	Prints out the current instance of the Function object to the command line for debugging.
+  """
   def toString(self):
-	  print("========================================")
-	  print()
-	  print("Name: " + str(self._name) + "\n")
-	  print("Description:")
-	  print(self._description + "\n")
-	  print("Parameters:")
-	  for parameter in self._parameters:
-		  parameter.toString()
-		  print()
-	  print("\nReturn value:")
-	  if self._returnValue != None:
-	         self._returnValue.toString()
-	  print()
-	  print("Code:")
-	  print(self._code)
-	  print("\n========================================\n")
-
-
+      print("========================================")
+      print("Name: " + str(self._name) + "\n")
+      print("Description:")
+      print(self._description + "\n")
+      print("Parameters:")
+      for parameter in self._parameters:
+          parameter.toString()
+          print()
+          print("\nReturn value:")
+      if self._return_value != None:
+	         self._return_value.toString()
+      print("Code:")
+      print(self._code)
+      print("Variables used:")
+      for variable in self._variables:
+          print(variable.name)
+      print("Functions called:")
+      for function in self._function_calls:
+          print(function.name)
+      print("========================================")
 
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   parameters = property(getParameters)
   returnValue = property(getReturnValue, setReturnValue)
   code = property(getCode, setCode)
+  functionCalls = property(getFunctionCalls)
+  variables = property(getVariables)
+  subDirectoryPath = property(getSubdirectoryPath)
 
 
 """
@@ -588,20 +662,20 @@ Returns:
 
 """
 def descriptionScraper(new_function):
-	description = ""
-	line = skipBlankLine()
-	while True:
-		if re.search(".*Parameters: *\n", line) or re.search(".*Returns: *\n", line) or re.search("(\*\/)", line):
-			break
-		elif re.search("^.*Description: *\n", line) or re.search("^.*Function Name: *\n", line):
-			unformedSyntaxHandler()
-		else:
-			description += re.search("([ *]*)([\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() <>]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()<>])( *\n)",  line, re.I | re.U).group(2) + "\n"
-		line = skipBlankLine()
-	if description.endswith("\n"):
-		description = description[:-1]
-	new_function.description = description
-	return line
+    description = ""
+    line = skipBlankLine()
+    while True:
+        if re.search(".*Parameters: *\n", line) or re.search(".*Returns: *\n", line) or re.search("(\*\/)", line):
+            break
+        elif re.search("^.*Description: *\n", line) or re.search("^.*Function Name: *\n", line):
+            unformedSyntaxHandler()
+        else:
+            description += re.search("([ *]*)([\w\[.!?\\\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() <>]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()<>])( *\n)",  line, re.I | re.U).group(2) + "\n"
+        line = skipBlankLine()
+    if description.endswith("\n"):
+        description = description[:-1]
+    new_function.description = description
+    return line
 
 """
 Function Name:
@@ -745,8 +819,6 @@ def harvestFunction():
 	documentedFunctions.append(new_function)
 
 
-	new_function.toString()
-
 
 """
   Function Name:
@@ -762,11 +834,40 @@ def harvestFunction():
   	String  line  the line with the library import to harvest
 """
 def harvestLibraryImport(line):
-	new_library = Library()
-	groups = re.search("( *)(#include)( *)([<\"\'][\w.\"\']*[\"\'>])( *)(\/\/)([\w ]*[\w ])( *\n)",  line, re.I | re.U)
-	new_library.name = groups.group(4)
-	new_library.description = groups.group(7)
-	new_library.toString()
+    new_library = Library()
+    groups = re.search("( *)(#include)( *)([<\"\'][\w.\"\']*[\"\'>])( *)(\/\/)([\w ]*[\w ])( *\n)",  line, re.I | re.U)
+    new_library.name = groups.group(4)
+    new_library.description = groups.group(7)
+    new_library.code = groups.group(1) + groups.group(2) + groups.group(3) + groups.group(4)
+
+
+"""
+  Function Name:
+
+  	analyzeFunctionBody
+
+  Description:
+
+  	Analyzes the plain text code of the body of a function and creates links to variables and other functions
+
+  Parameters:
+
+  	Function  function_to_analyze  the function to analyze the code of
+"""
+def analyzeFunctionBody(function_to_analyze):
+    code_to_analyze = function_to_analyze.code
+    for function in documentedFunctions:
+        if function.name != function_to_analyze.name:
+            if re.search(function.name + "(\(.*\))",  code_to_analyze, re.I | re.U):
+                function_to_analyze.appendFunctionCall(function)
+
+
+    for variable in documentedVariables:
+        if re.search(variable.name + "[ *]*=",  code_to_analyze, re.I | re.U):
+            print(variable.name)
+            function_to_analyze.appendVariable(variable)
+            variable.appendUsage(function)
+
 
 """
   Function Name:
@@ -856,6 +957,7 @@ def harvestConstant(line):
   else:
       new_constant.dataType = "keyword"
 
+  new_constant.code = line[0:value_right_index+1]
 
   documentedConstants.append(new_constant)
 
@@ -939,6 +1041,8 @@ def harvestVariable(line):
   else:
       new_variable.inital_value = "null"
 
+  new_variable.code = line[0:semicolon_index+1]
+
   documentedVariables.append(new_variable)
 
 """
@@ -992,6 +1096,13 @@ while True:
 		harvestConstant(currentLine)
 	elif isLibraryImport(currentLine):
 		harvestLibraryImport(currentLine)
+
+for function in documentedFunctions:
+    analyzeFunctionBody(function)
+
+for function in documentedFunctions:
+    function.toString()
+
 
 
 
