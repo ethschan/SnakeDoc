@@ -12,6 +12,7 @@ variableDeclarationTypes = ["double", "int", "String", "bool", "float", "char", 
 documentedConstants = []
 documentedVariables = []
 documentedFunctions = []
+documentedLibraries = []
 global currentLineIndex
 currentLineIndex = 0
 noExtensionFileName = ""
@@ -580,11 +581,10 @@ class Library:
     self._name = ""
     self._description = ""
     self._code = ""
-    self._subdirectory_path = ""
 
   def setName(self, name):
     self._name = name
-    self._subdirectory_path = "/libraries/" + name
+
 
   def setDescription(self, description):
      self._description = description
@@ -670,7 +670,6 @@ class Variable:
 
   def setName(self, name):
     self._name = name
-    self._subdirectory_path = "/variables/" + name
 
   def setDescription(self, description):
   	self._description = description
@@ -1151,7 +1150,7 @@ def isFunctionHeader(line):
 
 	Description:
 
-  	Checks if the given line is a libary import statement
+  	Checks if the given line is a library import statement
 
   Parameters:
 
@@ -1253,7 +1252,6 @@ def parameterScraper(new_function):
 			new_variable.dataType = groups.group(2)
 			new_variable.pointer_depth = new_variable.dataType.count("*")
 			new_variable.dataType = new_variable.dataType.replace("*", "")
-			new_variable.toString()
 			new_function.appendParameter(new_variable)
 		line = skipBlankLine()
 	return line
@@ -1385,6 +1383,7 @@ def harvestLibraryImport(line):
     new_library.name = groups.group(4)
     new_library.description = groups.group(7)
     new_library.code = groups.group(1) + groups.group(2) + groups.group(3) + groups.group(4)
+    documentedLibraries.append(new_library)
 
 
 """
@@ -1483,7 +1482,7 @@ def harvestConstant(line):
   floatFlag = False
 
   if new_constant.value.count(".") == 1:
-      floatFlag = new_constant.value.replace('.','',1).isdigit()
+      floatFlag = new_constant.value.replace(".", "", 1).replace("-", "", 1).isdigit()
 
   #quotes indicate it being a string
   stringFlag = False
@@ -1630,7 +1629,7 @@ def htmlHead(title, path):
     htmlString += "\n<head>"
     htmlString += "\n<title>" + title + "</title>"
     htmlString += "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-    htmlString += "\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + path + "\stylesheet.css\" title=\"Style\">"
+    htmlString += "\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + path + "\\stylesheets\stylesheet.css\" title=\"Style\">"
     htmlString += "\n<head>"
     return htmlString
 
@@ -1666,24 +1665,24 @@ def htmlNavBar(highlighted_link):
         htmlString += "\n<li><a href=\"../home.html\" class=\"navBarCell1Rev\">Home</a></li>"
 
     if highlighted_link != "Functions":
-        htmlString += "\n<li><a href=\"../functions/index.html\">Functions</a></li>"
+        htmlString += "\n<li><a href=\"../indexes/functionsIndex.html\">Functions</a></li>"
     else:
-        htmlString += "\n<li><a href=\"../functions/index.html\" class=\"navBarCell1Rev\">Functions</a></li>"
+        htmlString += "\n<li class=\"navBarCell1Rev\">Functions</li>"
 
     if highlighted_link != "Variables":
-        htmlString += "\n<li><a href=\"../variables/index.html\">Variables</a></li>"
+        htmlString += "\n<li><a href=\"../indexes/variablesIndex.html\">Variables</a></li>"
     else:
-        htmlString += "\n<li><a href=\"../variables/index.html\" class=\"navBarCell1Rev\">Variables</a></li>"
+        htmlString += "\n<li class=\"navBarCell1Rev\">Variables</li>"
 
     if highlighted_link != "Constants":
-        htmlString += "\n<li><a href=\"../constants/index.html\">Constants</a></li>"
+        htmlString += "\n<li><a href=\"../indexes/constantsIndex.html\">Constants</a></li>"
     else:
-        htmlString += "\n<li><a href=\"../constants/index.html\" class=\"navBarCell1Rev\">Constants</a></li>"
+        htmlString += "\n<li class=\"navBarCell1Rev\">Constants</li>"
 
     if highlighted_link != "Libraries":
-        htmlString += "\n<li><a href=\"../libraries/index.html\">Libraries</a></li>"
+        htmlString += "\n<li><a href=\"../indexes/librariesIndex.html\">Libraries</a></li>"
     else:
-        htmlString += "\n<li><a href=\"../libraries/index.html\" class=\"navBarCell1Rev\">Libraries</a></li>"
+        htmlString += "\n<li class=\"navBarCell1Rev\">Libraries</li>"
 
     htmlString += "\n</header>"
 
@@ -1894,6 +1893,52 @@ def htmlConstantSummary(in_constant):
     htmlString += "\n</td>"
     htmlString += "\n</tr>"
     htmlString += "\n</table>"
+
+    htmlString += "\n</section>"
+    htmlString += "\n</li>"
+    htmlString += "\n</ul>"
+    htmlString += "\n</li>"
+    htmlString += "\n</ul>"
+    htmlString += "\n</ul>"
+    htmlString += "\n</div>"
+
+    return htmlString
+
+"""
+    Function Name:
+
+        htmlLibrarySummary
+
+    Description:
+
+  	    Returns a String contaning the library summary of a constant file in HTML
+
+    Parameter:
+
+        Library  in_library  the library to create the HTML for a library summary
+
+    Returns:
+
+        String  htmlString  the html file string
+"""
+def htmlLibrarySummary(in_library):
+
+    htmlString = ""
+
+    htmlString += "\n<div class=\"details\">"
+    htmlString += "\n<ul class=\"blockList\">"
+    htmlString += "\n<section>"
+    htmlString += "\n<ul class=\"blockList\">"
+    htmlString += "\n<li class=\"blockList\">"
+    htmlString += "\n<a id=\"whitespace\"></a>"
+    htmlString += "\n<h3>Library Summary</h3>"
+    htmlString += "\n<a id=\"whitespace\"></a>"
+
+    htmlString += "\n<ul v class=\"blockList\">"
+    htmlString += "\n<li class=\"blockList\">"
+    htmlString += "\n<h4>Description</h4>"
+    htmlString += "\n<div class=\"block\">" + in_library.description.replace("\n", "<br \/>") + "</div>"
+    htmlString += "\n</li>"
 
     htmlString += "\n</section>"
     htmlString += "\n</li>"
@@ -2248,7 +2293,7 @@ def htmlVariableBody(in_variable):
 
     Parameter:
 
-        Consstant  in_constant  the function to create the constant body in HTML for
+        Constant  in_constant  the constant to create the constant body in HTML for
 
     Returns:
 
@@ -2282,6 +2327,62 @@ def htmlConstantBody(in_constant):
             buildCodeString += letter
 
     htmlString += "\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
+    htmlString += "\n</li>"
+    htmlString += "\n</ul>"
+    htmlString += "\n</li>"
+    htmlString += "\n</ul>"
+    htmlString += "\n</section>"
+    htmlString += "\n</li>"
+    htmlString += "\n</ul>"
+    htmlString += "\n</div>"
+
+    return htmlString
+
+"""
+    Function Name:
+
+        htmlLibraryBody
+
+    Description:
+
+  	    Returns a String contaning the the library body portion of the library page in HTML
+
+    Parameter:
+
+        Library  in_library  the library to create the library body in HTML for
+
+    Returns:
+
+        String  htmlString  the html file string
+"""
+def htmlLibraryBody(in_library):
+    htmlString = ""
+    htmlString += "\n<div class=\"details\">"
+    htmlString += "\n<ul class=\"blockList\">"
+    htmlString += "\n<li class=\"blockList\">"
+    htmlString += "\n<section>"
+    htmlString += "\n<ul class=\"blockList\">"
+    htmlString += "\n<li class=\"blockList\">"
+    htmlString += "\n<a id=\"whitespace\"></a>"
+    htmlString += "\n<h3>Library Import Statement</h3>"
+    htmlString += "\n<a id=\"whitespace\"></a>"
+    htmlString += "\n<ul class=\"blockListLast\">"
+    htmlString += "\n<li class=\"blockList\">"
+    htmlString += "\n<h4>" + in_library.name + "</h4>"
+    codeString = in_library.code
+    newLineFlag = False
+    buildCodeString = ""
+    for letter in codeString:
+        if letter == "\n":
+            newLineFlag = True
+            buildCodeString += "<br \/>"
+        elif letter == " " and newLineFlag:
+            buildCodeString += "&nbsp;&nbsp;"
+        else:
+            newLineFlag = False
+            buildCodeString += letter
+
+    htmlString += "\n<pre class=\"methodSignature\">" + buildCodeString.replace(">", "&gt;").replace("<", "&lt;") + "</pre>"
     htmlString += "\n</li>"
     htmlString += "\n</ul>"
     htmlString += "\n</li>"
@@ -2329,7 +2430,7 @@ def functionToHTML(function):
     fileHTML += "\n</body>"
     fileHTML += "\n</html>"
 
-    htmlFile = open(".\\" + noExtensionFileName + "\\functions\\" + function.name + ".html", "w")
+    htmlFile = open("./" + noExtensionFileName + "/functions/" + function.name + ".html", "w")
     htmlFile.write(fileHTML)
     htmlFile.close()
 
@@ -2368,7 +2469,7 @@ def variableToHTML(variable):
     fileHTML += "\n</body>"
     fileHTML += "\n</html>"
 
-    htmlFile = open(".\\" + noExtensionFileName + "\\variables\\" + variable.name + ".html", "w")
+    htmlFile = open("./" + noExtensionFileName + "/variables/" + variable.name + ".html", "w")
     htmlFile.write(fileHTML)
     htmlFile.close()
 
@@ -2407,11 +2508,47 @@ def constantToHTML(constant):
     fileHTML += "\n</body>"
     fileHTML += "\n</html>"
 
-    htmlFile = open(".\\" + noExtensionFileName + "\\constants\\" + constant.name + ".html", "w")
+    htmlFile = open("./" + noExtensionFileName + "/constants/" + constant.name + ".html", "w")
     htmlFile.write(fileHTML)
     htmlFile.close()
 
+"""
+Function Name:
 
+    libraryToHTML
+
+Description:
+
+  	Converts a Library object into a HTML file
+
+Parameters:
+
+    Library  library  the library to turn into a HTML file
+
+"""
+def libraryToHTML(library):
+    fileHTML = htmlHead(library.name, "..")
+    fileHTML += "\n<body>"
+    fileHTML += htmlNavBar("")
+    fileHTML += "\n<main>"
+    fileHTML += "\n<div class=\"header\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h2 title=\"Library Name\" class=\"title\">" + library.name.replace(">", "&gt;").replace("<", "&lt;") + "</h2>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"contentContainer\">"
+    fileHTML += "\n<div class=\"description\">"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+    fileHTML += htmlLibrarySummary(library)
+    fileHTML += htmlLibraryBody(library)
+    fileHTML += "\n</div>"
+    fileHTML += "\n</main>"
+    fileHTML += "\n</body>"
+    fileHTML += "\n</html>"
+
+    htmlFile = open("./" + noExtensionFileName + "/libraries/" + library.name.replace(">", "").replace("<", "") + ".html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
 
 
 """
@@ -2425,7 +2562,7 @@ Description:
 """
 def checkDirectoryAvailability():
     path = os.getcwd()
-    path += ".\\" + noExtensionFileName
+    path += "./" + noExtensionFileName
     if os.path.exists(path):
         exitMessage("Directory " + path + " is already in use, delete it and retry", 1)
 
@@ -2433,20 +2570,22 @@ def checkDirectoryAvailability():
 """
 Function Name:
 
-    createDirectory
+    createDirectories
 
 Description:
 
   	Creates the neccesary directories for the documentation
 """
-def createDirectory():
+def createDirectories():
     path = os.getcwd()
-    path += ".\\" + noExtensionFileName
+    path += "./" + noExtensionFileName
     os.mkdir(path)
     os.mkdir(path + "\\functions")
     os.mkdir(path + "\\variables")
     os.mkdir(path + "\\constants")
     os.mkdir(path + "\\libraries")
+    os.mkdir(path + "\\indexes")
+    os.mkdir(path + "\\stylesheets")
     # Maybe in the future...
     #os.mkdir(path + "\\TypeDefs")
     #os.mkdir(path + "\\Objects")
@@ -2454,7 +2593,7 @@ def createDirectory():
 """
 Function Name:
 
-    functionToHTML
+    writeCSS
 
 Description:
 
@@ -2462,10 +2601,416 @@ Description:
 
 """
 def writeCSS():
-    cssFile = open(".\\" + noExtensionFileName + "\\stylesheet.css", "w")
+    cssFile = open("./" + noExtensionFileName + "/stylesheets/stylesheet.css", "w")
     cssFile.write(stylesheetCSS)
     cssFile.close()
 
+"""
+Function Name:
+
+    dataToHTML
+
+Description:
+
+    Writes data present in objects to HTML files within respective files along with writing index files
+
+"""
+def dataToHTML():
+    for function in documentedFunctions:
+        functionToHTML(function)
+
+    for variable in documentedVariables:
+        variableToHTML(variable)
+
+    for constant in documentedConstants:
+        constantToHTML(constant)
+
+    for library in documentedLibraries:
+        libraryToHTML(library)
+
+
+
+"""
+Function Name:
+
+    writeIndexHTML
+
+Description:
+
+    Writes out the HTML for creating indexs under the indexes directory of generated documentation
+
+"""
+def writeIndexHTML():
+    functionsIndexHTML()
+    variablesIndexHTML()
+    constantsIndexHTML()
+    librariesIndexHTML()
+
+"""
+Function Name:
+
+    functionsIndexHTML
+
+Description:
+
+  	Creates the HTML for the function index page
+"""
+def functionsIndexHTML():
+    fileHTML = htmlHead("Function Index", "..")
+    fileHTML += "\n<body>"
+    fileHTML += htmlNavBar("Functions")
+    fileHTML += "\n<main>"
+    fileHTML += "\n<div class=\"header\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h2 title=\"Function Index Header\" class=\"title\">Function Index</h2>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"contentContainer\">"
+    fileHTML += "\n<div class=\"description\">"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"details\">"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<section>"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<li class=\"blockList\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h3>Functions</h3>"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+
+    if len(documentedFunctions) >= 1:
+        fileHTML += "\n<table class=\"memberSummary\">"
+        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        fileHTML += "\n<tr>"
+        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Parameter Count</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Return Type</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Functions Called</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Global Variables Manipulated</th>"
+        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Constants Referenced</th>"
+        fileHTML += "</tr>"
+        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+
+
+        for function in documentedFunctions:
+            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
+            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../functions/" + function.name + ".html\">" + function.name + "</a></code></td>"
+            fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.parameters)) + "</code></div></td>"
+            if function.returnValue != None:
+                fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + function.returnValue.pointer_depth * "*" + function.returnValue.dataType + "</code></th>"
+            else:
+                fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>void</code></th>"
+            fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.functionCalls)) + "</code></div></td>"
+            fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.variables)) + "</code></div></td>"
+            fileHTML += "\n<td class=\"colLast\"><div class=\"block\"><code>" + str(len(function.constants)) + "</code></div></td>"
+            fileHTML += "\n</tr>"
+
+        fileHTML += "\n</table>"
+
+    fileHTML += "\n</section>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+
+    fileHTML += "\n</div>"
+    fileHTML += "\n</main>"
+    fileHTML += "\n</body>"
+    fileHTML += "\n</html>"
+
+    htmlFile = open("./" + noExtensionFileName + "/indexes/functionsIndex.html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
+
+"""
+Function Name:
+
+    variablesIndexHTML
+
+Description:
+
+  	Creates the HTML for the variable index page
+"""
+def variablesIndexHTML():
+    fileHTML = htmlHead("Variable Index", "..")
+    fileHTML += "\n<body>"
+    fileHTML += htmlNavBar("Variables")
+    fileHTML += "\n<main>"
+    fileHTML += "\n<div class=\"header\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h2 title=\"Variable Index Header\" class=\"title\">Variable Index</h2>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"contentContainer\">"
+    fileHTML += "\n<div class=\"description\">"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"details\">"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<section>"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<li class=\"blockList\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h3>Variables</h3>"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+
+    if len(documentedVariables) >= 1:
+        fileHTML += "\n<table class=\"memberSummary\">"
+        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        fileHTML += "\n<tr>"
+        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Data Type</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Inital Value</th>"
+        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
+        fileHTML += "</tr>"
+        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+
+
+        for variable in documentedVariables:
+            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
+            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../variables/" + variable.name + ".html\">" + variable.name + "</a></code></td>"
+            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.pointer_depth * "*" + variable.dataType + "</code></th>"
+            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.inital_value + "</code></th>"
+            fileHTML += "\n<td class=\"colLast\">"
+            fileHTML += "\n<div class=\"block\"><code>" + str(len(variable.usage)) + "</code></div>"
+            fileHTML += "\n</td>"
+            fileHTML += "\n</tr>"
+
+        fileHTML += "\n</table>"
+
+    fileHTML += "\n</section>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+
+    fileHTML += "\n</div>"
+    fileHTML += "\n</main>"
+    fileHTML += "\n</body>"
+    fileHTML += "\n</html>"
+
+    htmlFile = open("./" + noExtensionFileName + "/indexes/variablesIndex.html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
+
+"""
+Function Name:
+
+    constantsIndexHTML
+
+Description:
+
+  	Creates the HTML for the constants index page
+"""
+def constantsIndexHTML():
+    fileHTML = htmlHead("Constant Index", "..")
+    fileHTML += "\n<body>"
+    fileHTML += htmlNavBar("Constants")
+    fileHTML += "\n<main>"
+    fileHTML += "\n<div class=\"header\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h2 title=\"Constant Index Header\" class=\"title\">Constant Index</h2>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"contentContainer\">"
+    fileHTML += "\n<div class=\"description\">"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"details\">"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<section>"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<li class=\"blockList\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h3>Constants</h3>"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+
+    if len(documentedConstants) >= 1:
+        fileHTML += "\n<table class=\"memberSummary\">"
+        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        fileHTML += "\n<tr>"
+        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Value</th>"
+        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
+        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Assumed Data Type</th>"
+        fileHTML += "</tr>"
+        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+
+
+        for constant in documentedConstants:
+            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
+            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../constants/" + constant.name + ".html\">" + constant.name + "</a></code></td>"
+            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + constant.value + "</code></th>"
+            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + str(len(constant.usage)) + "</code></th>"
+            fileHTML += "\n<td class=\"colLast\">"
+            fileHTML += "\n<div class=\"block\">" + constant.dataType + "</div>"
+            fileHTML += "\n</td>"
+            fileHTML += "\n</tr>"
+
+        fileHTML += "\n</table>"
+
+    fileHTML += "\n</section>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+
+    fileHTML += "\n</div>"
+    fileHTML += "\n</main>"
+    fileHTML += "\n</body>"
+    fileHTML += "\n</html>"
+
+    htmlFile = open("./" + noExtensionFileName + "/indexes/constantsIndex.html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
+
+"""
+Function Name:
+
+    librariesIndexHTML
+
+Description:
+
+  	Creates the HTML for the libraries index page
+"""
+def librariesIndexHTML():
+    fileHTML = htmlHead("Libraries Index", "..")
+    fileHTML += "\n<body>"
+    fileHTML += htmlNavBar("Libraries")
+    fileHTML += "\n<main>"
+    fileHTML += "\n<div class=\"header\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h2 title=\"Library Index Header\" class=\"title\">Library Index</h2>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"contentContainer\">"
+    fileHTML += "\n<div class=\"description\">"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"details\">"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<section>"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<li class=\"blockList\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h3>Libraries</h3>"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+
+    if len(documentedLibraries) >= 1:
+        fileHTML += "\n<table class=\"memberSummary\">"
+        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        fileHTML += "\n<tr>"
+        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+        fileHTML += "</tr>"
+        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+
+
+        for library in documentedLibraries:
+            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
+            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../libraries/" + library.name.replace(">", "").replace("<", "") + ".html\">" + library.name.replace(">", "").replace("<", "") + "</a></code></td>"
+            fileHTML += "\n<td class=\"colLast\">"
+            fileHTML += "\n<div class=\"block\">" + library.description.replace("\n", "<br \/>") + "</div>"
+            fileHTML += "\n</td>"
+            fileHTML += "\n</tr>"
+
+        fileHTML += "\n</table>"
+
+    fileHTML += "\n</section>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+
+    fileHTML += "\n</div>"
+    fileHTML += "\n</main>"
+    fileHTML += "\n</body>"
+    fileHTML += "\n</html>"
+
+    htmlFile = open("./" + noExtensionFileName + "/indexes/librariesIndex.html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
+
+def writeHomeHTML():
+    global currentLineIndex
+    fileHTML = htmlHead("Home", ".")
+    fileHTML += "\n<body>"
+    fileHTML += "\n<body>"
+    fileHTML += "\n<header>"
+    fileHTML += "\n<nav>"
+    fileHTML += "<div class=\"topNav\">"
+    fileHTML += "<a id=\"navbar.top\"></a>"
+    fileHTML += "\n<ul class=\"navList\" title=\"Navigation\">"
+
+    fileHTML += "\n<li class=\"navBarCell1Rev\">Home</li>"
+    fileHTML += "\n<li><a href=\"./indexes/functionsIndex.html\">Functions</a></li>"
+    fileHTML += "\n<li><a href=\"./indexes/variablesIndex.html\">Variables</a></li>"
+    fileHTML += "\n<li><a href=\"./indexes/constantsIndex.html\">Constants</a></li>"
+    fileHTML += "\n<li><a href=\"./indexes/librariesIndex.html\">Libraries</a></li>"
+    fileHTML += "\n</header>"
+
+    fileHTML += "\n<main>"
+    fileHTML += "\n<div class=\"header\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h2 title=\"Homepage Header\" class=\"title\">" + path + "</h2>"
+    fileHTML += "\n</div>"
+    fileHTML += "\n<div class=\"contentContainer\">"
+    fileHTML += "\n<div class=\"description\">"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+
+    fileHTML += "\n<div class=\"details\">"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<section>"
+    fileHTML += "\n<ul class=\"blockList\">"
+    fileHTML += "\n<li class=\"blockList\">"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML += "\n<h3>Program Overview</h3>"
+    fileHTML += "\n<a id=\"whitespace\"></a>"
+
+    fileHTML += "\n<table class=\"memberSummary\">"
+    fileHTML += "\n<caption><span>Size</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+    fileHTML += "\n<tr>"
+    fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Functions</th>"
+    fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Variables</th>"
+    fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Constants</th>"
+    fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Libraries</th>"
+    fileHTML += "\n<th class=\"colLast\" scope=\"col\">Lines</th>"
+    fileHTML += "</tr>"
+    fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+
+    fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
+    fileHTML += "\n<td class=\"colFirst\"><code>" + str(len(documentedFunctions)) + "</code></td>"
+    fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedVariables)) + "</code></td>"
+    fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedConstants)) + "</code></td>"
+    fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedLibraries)) + "</code></td>"
+    fileHTML += "\n<td class=\"colLast\">"
+    fileHTML += "\n<code>" + str(currentLineIndex) + "</code>"
+    fileHTML += "\n</td>"
+    fileHTML += "\n</tr>"
+
+    fileHTML += "\n</table>"
+
+    fileHTML += "\n</section>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</li>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</ul>"
+    fileHTML += "\n</div>"
+
+    fileHTML += "\n</div>"
+    fileHTML += "\n</main>"
+    fileHTML += "\n</body>"
+    fileHTML += "\n</html>"
+
+    htmlFile = open("./" + noExtensionFileName + "/home.html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
 
 
 """
@@ -2526,16 +3071,8 @@ while True:
 for function in documentedFunctions:
     analyzeFunctionBody(function)
 
-
-createDirectory()
-
+createDirectories()
 writeCSS()
-
-for function in documentedFunctions:
-    functionToHTML(function)
-
-for variable in documentedVariables:
-    variableToHTML(variable)
-
-for constant in documentedConstants:
-    constantToHTML(constant)
+dataToHTML()
+writeIndexHTML()
+writeHomeHTML()
