@@ -1,14 +1,12 @@
-#work on security
-
 #Import Statements
 import sys
 import re
 import os
 
-
+#Global Variables
 path = ""
-validExtensions = ["ino", "cpp", "INO", "CPP"]
-variableDeclarationTypes = ["double", "int", "String", "bool", "float", "char", "Integer", "long", "unsigned", "void", "string", "File"]
+validExtensions = ["ino", "cpp", "INO", "CPP", "h", "H", "hpp", "HPP", "hxx", "HXX", "cxx", "CXX", "cc", "CC"]
+variableDeclarationTypes = ["double", "int", "bool", "float", "char", "long", "unsigned", "void", "string", "File", "short", "SdVolume", "Sd2Card", "SdFile"]
 documentedConstants = []
 documentedVariables = []
 documentedFunctions = []
@@ -17,6 +15,7 @@ global currentLineIndex
 currentLineIndex = 0
 noExtensionFileName = ""
 
+#CSS Stylesheet
 stylesheetCSS = """body {
     background-color:#ffffff;
     color:#353833;
@@ -547,34 +546,31 @@ table.striped > tbody > tr > th {
     font-weight: normal;
 }"""
 
-
 """
 ***************************************************************
 CLASS NAME:
 
-  Library
+    Library
 
 DESCRIPTION:
 
-  Object that repersents an imported library statement
-
+    Object that repersents a library import statement
 ***************************************************************
 """
 class Library:
-
   """
   Function Name:
 
-  	__init__
+    __init__
 
-	Description:
+  Description:
 
-  	Constructor for Library
+    Constructor for Library
 
   Variables:
 
   	String  name  the name of the imported library
-    String  description  description of usage in the program
+    String  description  description of the usage of the library in the program
     String  code  the plain text code of the library import statement
   """
   def __init__(self):
@@ -584,7 +580,6 @@ class Library:
 
   def setName(self, name):
     self._name = name
-
 
   def setDescription(self, description):
      self._description = description
@@ -601,8 +596,6 @@ class Library:
   def getCode(self):
       return self._code
 
-
-
   """
   Function Name:
 
@@ -610,7 +603,7 @@ class Library:
 
   Description:
 
-  	Prints out the current instance of a Library object to the command line for debugging.
+    Prints out the Library object to the command line
   """
   def toString(self):
       print("Name: " + self._name)
@@ -618,10 +611,10 @@ class Library:
       print("Code: " + self._code)
       print()
 
+  #Property Calls
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   code = property(getCode, setCode)
-
 
 """
 ***************************************************************
@@ -631,29 +624,27 @@ CLASS NAME:
 
 DESCRIPTION:
 
-  Object that repersents a variable declared in a program
-
+  Object that repersents a global variable declaration in the program
 ***************************************************************
 """
 class Variable:
-
   """
   Function Name:
 
   	__init__
 
-	Description:
+  Description:
 
   	Constructor for Variable
 
   Variables:
 
-  	String  _dataType  type of the variable
-    String  _name  name of the variable
-    String  _description  description of the variable
-    String  _inital_value  the inital value set to the variable
-    Functions[]  _usage  functions the variable is used in
-    int  _pointer_depth  the pointer depth of the variable
+  	String  dataType  type of the variable
+    String  name  name of the variable
+    String  description  description of the variable
+    String  inital_value  the inital value set to the variable
+    Functions[]  usage  functions the variable is used in
+    int  pointer_depth  the pointer depth of the variable
     String  code  the plain text code of the variable declaration
   """
   def __init__(self):
@@ -707,8 +698,6 @@ class Variable:
   def getCode(self):
       return self._code
 
-
-
   """
   Function Name:
 
@@ -716,7 +705,7 @@ class Variable:
 
   Description:
 
-  	Prints out the current instance of a Variable object to the command line for debugging.
+  	Prints out the current instance of a Variable object to the command line
   """
   def toString(self):
       print("Name: " + self._name)
@@ -729,7 +718,7 @@ class Variable:
           print(function.name)
       print()
 
-
+  #Property Calls
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
   description = property(getDescription, setDescription)
@@ -737,7 +726,6 @@ class Variable:
   inital_value = property(getInitalValue, setInitalValue)
   pointer_depth = property(getPointerDepth, setPointerDepth)
   code = property(getCode, setCode)
-
 
 """
 ***************************************************************
@@ -747,29 +735,27 @@ CLASS NAME:
 
 DESCRIPTION:
 
-	object for containg details about constants throughout the program
-
+	Object that repersents a constant declaration in the program
 ***************************************************************
 """
 class Constant:
-
   """
   Function Name:
 
   	__init__
 
-	Description:
+  Description:
 
   	Constructor for Constant
 
   Variables:
 
-  	String  _dataType  type of the constant
-    String  _name  name of the constant
-    String  _description  description of the constant
-    Functions[]  _usage  functions the variable is used in
-    String  _value  the value of the constant
-    String  _code  the plain text code
+  	String  dataType  predicted data type of the constant
+    String  name  name of the constant
+    String  description  description of the constant
+    Functions[]  usage  functions the constant is used in
+    String  value  the value of the constant
+    String  code  the plain text code of the constant declaration
   """
   def __init__(self):
     self._dataType = ""
@@ -815,7 +801,6 @@ class Constant:
   def getUsage(self):
       return self._usage
 
-
   """
   Function Name:
 
@@ -823,7 +808,7 @@ class Constant:
 
   Description:
 
-  	Prints out the current instance of the Constant object to the command line for debugging
+  	Prints out the Constant object to the command line
   """
   def toString(self):
     print("Name: " + self._name)
@@ -835,14 +820,13 @@ class Constant:
         print(function.name)
     print()
 
+  #Property Calls
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   value = property(getValue, setValue)
   code = property(getCode, setCode)
   usage = property(getUsage)
-
-
 
 """
 ***************************************************************
@@ -852,30 +836,28 @@ CLASS NAME:
 
 DESCRIPTION:
 
-	Object repersenting a Function
-
+	Object repersenting a Function in the program
 ***************************************************************
 """
 class Function:
-
   """
   Function Name:
 
   	__init__
 
-	Description:
+  Description:
 
   	Constructor for Function
 
   Variables:
 
   	String  name  name of the function
-    String  description  description of the function usage
+    String  description  description of the function
     Variable[]  parameters  parameters of the function
     Variable  returnValue  return value of the function
 	Variable[]  variables  the global variables manipulated by the function
     Constant[] constants  the global constants referenced by the fucntion
-	Functions[]  functionCalls  the functions the function calls
+	Functions[]  functionCalls  functions called by the function
 	String  code  the plain text code of the function
   """
   def __init__(self):
@@ -967,6 +949,7 @@ class Function:
           print(function.name)
       print("========================================")
 
+  #Property Calls
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   parameters = property(getParameters)
@@ -976,15 +959,14 @@ class Function:
   variables = property(getVariables)
   constants = property(getConstants)
 
-
 """
   Function Name:
 
   	exitMessage
 
-	Description:
+  Description:
 
-  	Prints specified message then exits program with specified exit code.
+  	Prints specified message then exits program with specified exit code
 
   Parameters:
 
@@ -1000,27 +982,27 @@ def exitMessage(message, code):
 
   	unformedSyntaxHandler
 
-    Description:
+  Description:
 
-  	Wrapper for exitMessage with repeatedly used unformed syntax message
+  	Wrapper for exitMessage with an unformed syntax message including the offending line, exiting with code 1
 """
 def unformedSyntaxHandler():
     exitMessage("Unformed syntax, please check line " + str(currentLineIndex), 1)
-
 
 """
   Function Name:
 
   	findN
 
-	Description:
+  Description:
 
-  	Returns the index of the nth substring of input.
+  	Returns the index of the nth substring of input
 
   Parameters:
 
-  	String  message  the message to print out
-    int  code  the exit code
+  	String  s  the string to search
+    String  substr  the substring to search for
+    int  n  the nth occurrence to search for
 """
 def findN(s, substr, n):
     if n <= s.count(substr) and n > -1:
@@ -1036,7 +1018,7 @@ def findN(s, substr, n):
 
   	isVariableDeclaration
 
-	Description:
+  Description:
 
   	Checks if the given line is a variable declaration
 
@@ -1049,11 +1031,9 @@ def findN(s, substr, n):
   	boolean  isVariable  returns True if line contains variable declaration, returns False otherwise
 """
 def isVariableDeclaration(line):
-    for datatype in variableDeclarationTypes:
-        if line.startswith(datatype):
-            commentIndex = line.find("//")
-            semicolonIndex = line.find(';')
-            if semicolonIndex != -1 and (semicolonIndex < commentIndex or commentIndex == -1):
+    for dataType in variableDeclarationTypes:
+        if re.search(" *" + dataType, line):
+            if re.search("//", line) and re.search(";", line):
                 return True
             break
     return False
@@ -1063,7 +1043,7 @@ def isVariableDeclaration(line):
 
   	isConstantDeclaration
 
-	Description:
+  Description:
 
   	Checks if the given line is a constant declaration
 
@@ -1076,34 +1056,31 @@ def isVariableDeclaration(line):
   	boolean  isConstant  returns True if line contains constant declaration, returns False otherwise
 """
 def isConstantDeclaration(line):
-    if currentLine.startswith("#define"):
+    if re.search("^.*#define", line):
         return True
     return False
-
-
-
 
 """
     Function Name:
 
-    	searchForChar
+      searchForChar
 
     Description:
 
-        Searches left or right in a given String from a given index character by character
-        to find a character or the absence of a character, returning the index the feature is found at
+      Searches left or right in a given String from a given index character by character
+      to find a character or the absence of a character, returning the index the feature is found at
 
     Parameters:
 
-        String  string  the string to search for given character
-        char  char  the char to search for the presence or absence of
-        int  increment  the increment to change each time (1 to search left by 1, -1 to search right by 1)
-        int  startIndex  the index to start from while searching
-        bool  presence  if True the presence of the character will be searched for, if False the absence of the character will be searched for
+      String  string  the string to search for given character
+      char  char  the char to search for the presence or absence of
+      int  increment  the increment to change each time (1 to search left by 1, -1 to search right by 1)
+      int  startIndex  the index to start from while searching
+      bool  presence  if True the presence of the character will be searched for, if False the absence of the character will be searched for
 
     Returns:
 
-        int  index  the index the request is found at in the given String, if there is an error or the character is not found -1
+      int  index  the index the request is found at in the given String, if there is an error or the character is not found -1
 """
 def searchForChar(string, char, increment, startIndex, presence):
     if startIndex < 0 or startIndex >= len(string):
@@ -1126,9 +1103,9 @@ def searchForChar(string, char, increment, startIndex, presence):
 
   	isFunctionHeader
 
-	Description:
+  Description:
 
-  	Checks if the given line is the start of a function header by looking for "Function Name:"
+  	Checks if the given line is the start of a function header
 
   Parameters:
 
@@ -1148,7 +1125,7 @@ def isFunctionHeader(line):
 
   	isLibraryImport
 
-	Description:
+  Description:
 
   	Checks if the given line is a library import statement
 
@@ -1165,16 +1142,14 @@ def isLibraryImport(line):
         return True
     return False
 
-
 """
-Function Name:
+    Function Name:
 
-  	skipBlankLine
+  	  skipBlankLine
 
-Description:
+    Description:
 
-  	skips lines until it encounters a line that doens't contain solely asterisks, spaces, and new line characters
-
+      Skips lines until it encounters a line that doens't contain solely asterisks, spaces, and new line characters or is the end of a group comment (*/)
 """
 def skipBlankLine():
     global currentLineIndex
@@ -1187,22 +1162,21 @@ def skipBlankLine():
             return line
 
 """
-Function Name:
+    Function Name:
 
-  	descriptionScraper
+  	  descriptionScraper
 
-Description:
+    Description:
 
-  	Scrapes the description section of a function header after encountering the "Description:" header
+  	  Scrapes the description section of a function header and sets fields of a Function object to harvested values
 
-Parameters:
+    Parameters:
 
-	Function  new_function  takes in a  function to set the harvested description to
+	  Function  new_function  takes in a  function to set the harvested description to
 
-Returns:
+    Returns:
 
-	String  line  return the last line read triggering exit
-
+	  String  line  return the last line read as it triggered an exit
 """
 def descriptionScraper(new_function):
     description = ""
@@ -1215,28 +1189,29 @@ def descriptionScraper(new_function):
         else:
             description += re.search("([ *]*)([\w\[.!?\\\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() <>]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()<>])( *\n)",  line, re.I | re.U).group(2) + "\n"
         line = skipBlankLine()
+
+    #Remove last end of line character if present
     if description.endswith("\n"):
         description = description[:-1]
     new_function.description = description
     return line
 
 """
-Function Name:
+    Function Name:
 
-  	parameterScraper
+  	  parameterScraper
 
-Description:
+    Description:
 
-  	Scrapes the parameters section of a function header after encountering the "Parameter:" header
+      Scrapes the parameters section of a function header and sets fields of a Function object to harvested values
 
-Parameters:
+    Parameters:
 
-	Function  new_function  takes in a  function to store the harvested parameters in
+      Function  new_function  takes in a  function to store the harvested parameters in
 
-Returns:
+    Returns:
 
-	String  line  return the last line read triggering exit
-
+      String  line  return the last return the last line read as it triggered an exit
 """
 def parameterScraper(new_function):
 	line = skipBlankLine()
@@ -1263,7 +1238,7 @@ Function Name:
 
 Description:
 
-  	Scrapes the return section of a function header after encountering the "Returns:" header
+  	Scrapes the return section of a function header and sets fields of a Function object to harvested values
 
 Parameters:
 
@@ -1271,8 +1246,7 @@ Parameters:
 
 Returns:
 
-	String  line  return the last line read triggering exit
-
+      String  line  return the last return the last line read as it triggered an exit
 """
 def returnScraper(new_function):
 	line = skipBlankLine()
@@ -1298,29 +1272,28 @@ def returnScraper(new_function):
 
   Description:
 
-  	Harvests function declaration and its header into a function object form then appends to global list of functions
-
+  	Harvests function declaration and its header into a function object then appended the created object to the global list of functions documentedFunctions
 """
 def harvestFunction():
 	global currentLineIndex
 	new_function = Function()
-	#keep going until we find a non-blank line (has the function name)
+	#Keep going until we find a non-blank line (has the function name)
 	line = skipBlankLine()
 
 	if re.search("^.*Description: *\n", line):
 		unformedSyntaxHandler()
 
-	#harvest function name from line
+	#Harvest function name from line
 	new_function.name = re.sub("(\W)", "",  line)
-	#keep going until we encounter another field, (description field)
+	#Keep going until we encounter another field, (description field)
 	line = skipBlankLine()
 
 
-	#check if field is description field
+	#Check if field is description field
 	if re.search("^.*Description: *\n", line):
 		line = descriptionScraper(new_function)
 	else:
-		#couldn't find description header
+		#Couldn't find description header
 		unformedSyntaxHandler()
 
 	headingsHarvestedCount = 0
@@ -1334,10 +1307,11 @@ def harvestFunction():
 			line = skipBlankLine()
 			headingsHarvestedCount -= 1
 		elif re.search("(\*\/)", line):
-			#done harvesting the function header
+			#Done harvesting the function header
 			break
 		headingsHarvestedCount += 1
 
+    #Confirm end of header was found
 	if not re.search("(\*\/)", line):
 		line = skipBlankLine()
 		if not re.search("(\*\/)", line):
@@ -1347,6 +1321,7 @@ def harvestFunction():
 
 	code = ""
 
+    #Harvest plain-text code
 	opening_curly_count = line.count("{")
 	closing_curly_count = line.count("}")
 	code = line
@@ -1360,9 +1335,8 @@ def harvestFunction():
 
 	new_function.code = code
 
+    #Append the created Function object
 	documentedFunctions.append(new_function)
-
-
 
 """
   Function Name:
@@ -1371,7 +1345,7 @@ def harvestFunction():
 
   Description:
 
-  	Harvests a library import statement then appends the newly created object to a global list
+  	Harvests a library import statement then appends the newly created object to documentedLibraries
 
   Parameters:
 
@@ -1385,7 +1359,6 @@ def harvestLibraryImport(line):
     new_library.code = groups.group(1) + groups.group(2) + groups.group(3) + groups.group(4)
     documentedLibraries.append(new_library)
 
-
 """
   Function Name:
 
@@ -1393,7 +1366,7 @@ def harvestLibraryImport(line):
 
   Description:
 
-  	Analyzes the plain text code of the body of a function and creates links to variables and other functions
+  	Analyzes the plain text code of the body of a function and creates links within objects
 
   Parameters:
 
@@ -1417,7 +1390,6 @@ def analyzeFunctionBody(function_to_analyze):
             function_to_analyze.appendConstant(constant)
             constant.appendUsage(function_to_analyze)
 
-
 """
   Function Name:
 
@@ -1425,14 +1397,14 @@ def analyzeFunctionBody(function_to_analyze):
 
   Description:
 
-  	Harvests constant declaration into Variable object form then appends to global list of constants
+  	Harvests constant declaration into Constant object form then appends the newly created object to the documentedConstants list
 
   Parameters:
 
   	String  line  the line with the constant declaration to harvest
 """
 def harvestConstant(line):
-  #create new instance of Constant object
+  #Create a new instance of a Constant object
   new_constant = Constant()
 
   #collect indexes
@@ -1518,7 +1490,7 @@ def harvestConstant(line):
 
 	Description:
 
-  	Harvests variable declaration into Variable object form then appends to global list of variables
+  	Harvests variable declaration into Variable object form then appends to the object to documentedVariables
 
   Parameters:
 
@@ -1695,11 +1667,11 @@ def htmlNavBar(highlighted_link):
 
     Description:
 
-  	    Returns a String contaning the function summary of a function file in HTML
+  	    Returns a String contaning a function summary in HTML
 
     Parameter:
 
-        Function  in_function  the function to create the HTML for a function summary for
+        Function  in_function  the function to turn into a HTML function summary
 
     Returns:
 
@@ -1785,11 +1757,11 @@ def htmlFunctionSummary(in_function):
 
     Description:
 
-  	    Returns a String contaning the variable summary of a variable file in HTML
+  	    Returns a String contaning the variable summary of a variable page in HTML
 
     Parameter:
 
-        Variable  in_variable  the variable to create the HTML for a variable summary
+        Variable  in_variable  the variable to turn into a HTML variable summary
 
     Returns:
 
@@ -1848,11 +1820,11 @@ def htmlVariableSummary(in_variable):
 
     Description:
 
-  	    Returns a String contaning the constant summary of a constant file in HTML
+  	    Returns a String contaning the constant summary of a constant page in HTML
 
     Parameter:
 
-        Constant  in_constant  the variable to create the HTML for a variable summary
+        Constant  in_constant  the constant to turn into a HTML constat summary
 
     Returns:
 
@@ -1911,11 +1883,11 @@ def htmlConstantSummary(in_constant):
 
     Description:
 
-  	    Returns a String contaning the library summary of a constant file in HTML
+  	    Returns a String contaning a HTML library summary
 
     Parameter:
 
-        Library  in_library  the library to create the HTML for a library summary
+        Library  in_library  the library to turn into a HTML library summary
 
     Returns:
 
@@ -2971,6 +2943,8 @@ def writeHomeHTML():
     fileHTML += "\n<a id=\"whitespace\"></a>"
     fileHTML += "\n<h3>Program Overview</h3>"
     fileHTML += "\n<a id=\"whitespace\"></a>"
+
+
 
     fileHTML += "\n<table class=\"memberSummary\">"
     fileHTML += "\n<caption><span>Size</span><span class=\"tabEnd\">&nbsp;</span></caption>"
