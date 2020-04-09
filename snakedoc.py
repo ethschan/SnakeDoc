@@ -1,12 +1,14 @@
+#work on security
+
 #Import Statements
 import sys
 import re
 import os
 
-#Global Variables
+
 path = ""
-validExtensions = ["ino", "cpp", "INO", "CPP", "h", "H", "hpp", "HPP", "hxx", "HXX", "cxx", "CXX", "cc", "CC"]
-variableDeclarationTypes = ["double", "int", "bool", "float", "char", "long", "unsigned", "void", "string", "File", "short", "SdVolume", "Sd2Card", "SdFile"]
+validExtensions = ["ino", "cpp", "INO", "CPP"]
+variableDeclarationTypes = ["double", "int", "String", "bool", "float", "char", "Integer", "long", "unsigned", "void", "string", "File"]
 documentedConstants = []
 documentedVariables = []
 documentedFunctions = []
@@ -15,7 +17,6 @@ global currentLineIndex
 currentLineIndex = 0
 noExtensionFileName = ""
 
-#CSS Stylesheet
 stylesheetCSS = """body {
     background-color:#ffffff;
     color:#353833;
@@ -546,31 +547,34 @@ table.striped > tbody > tr > th {
     font-weight: normal;
 }"""
 
+
 """
 ***************************************************************
 CLASS NAME:
 
-    Library
+  Library
 
 DESCRIPTION:
 
-    Object that repersents a library import statement
+  Object that repersents an imported library statement
+
 ***************************************************************
 """
 class Library:
+
   """
   Function Name:
 
-    __init__
+  	__init__
 
-  Description:
+	Description:
 
-    Constructor for Library
+  	Constructor for Library
 
   Variables:
 
   	String  name  the name of the imported library
-    String  description  description of the usage of the library in the program
+    String  description  description of usage in the program
     String  code  the plain text code of the library import statement
   """
   def __init__(self):
@@ -580,6 +584,7 @@ class Library:
 
   def setName(self, name):
     self._name = name
+
 
   def setDescription(self, description):
      self._description = description
@@ -596,6 +601,8 @@ class Library:
   def getCode(self):
       return self._code
 
+
+
   """
   Function Name:
 
@@ -603,7 +610,7 @@ class Library:
 
   Description:
 
-    Prints out the Library object to the command line
+  	Prints out the current instance of a Library object to the command line for debugging.
   """
   def toString(self):
       print("Name: " + self._name)
@@ -611,10 +618,10 @@ class Library:
       print("Code: " + self._code)
       print()
 
-  #Property Calls
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   code = property(getCode, setCode)
+
 
 """
 ***************************************************************
@@ -624,27 +631,29 @@ CLASS NAME:
 
 DESCRIPTION:
 
-  Object that repersents a global variable declaration in the program
+  Object that repersents a variable declared in a program
+
 ***************************************************************
 """
 class Variable:
+
   """
   Function Name:
 
   	__init__
 
-  Description:
+	Description:
 
   	Constructor for Variable
 
   Variables:
 
-  	String  dataType  type of the variable
-    String  name  name of the variable
-    String  description  description of the variable
-    String  inital_value  the inital value set to the variable
-    Functions[]  usage  functions the variable is used in
-    int  pointer_depth  the pointer depth of the variable
+  	String  _dataType  type of the variable
+    String  _name  name of the variable
+    String  _description  description of the variable
+    String  _inital_value  the inital value set to the variable
+    Functions[]  _usage  functions the variable is used in
+    int  _pointer_depth  the pointer depth of the variable
     String  code  the plain text code of the variable declaration
   """
   def __init__(self):
@@ -698,6 +707,8 @@ class Variable:
   def getCode(self):
       return self._code
 
+
+
   """
   Function Name:
 
@@ -705,7 +716,7 @@ class Variable:
 
   Description:
 
-  	Prints out the current instance of a Variable object to the command line
+  	Prints out the current instance of a Variable object to the command line for debugging.
   """
   def toString(self):
       print("Name: " + self._name)
@@ -718,7 +729,7 @@ class Variable:
           print(function.name)
       print()
 
-  #Property Calls
+
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
   description = property(getDescription, setDescription)
@@ -726,6 +737,7 @@ class Variable:
   inital_value = property(getInitalValue, setInitalValue)
   pointer_depth = property(getPointerDepth, setPointerDepth)
   code = property(getCode, setCode)
+
 
 """
 ***************************************************************
@@ -735,27 +747,29 @@ CLASS NAME:
 
 DESCRIPTION:
 
-	Object that repersents a constant declaration in the program
+	object for containg details about constants throughout the program
+
 ***************************************************************
 """
 class Constant:
+
   """
   Function Name:
 
   	__init__
 
-  Description:
+	Description:
 
   	Constructor for Constant
 
   Variables:
 
-  	String  dataType  predicted data type of the constant
-    String  name  name of the constant
-    String  description  description of the constant
-    Functions[]  usage  functions the constant is used in
-    String  value  the value of the constant
-    String  code  the plain text code of the constant declaration
+  	String  _dataType  type of the constant
+    String  _name  name of the constant
+    String  _description  description of the constant
+    Functions[]  _usage  functions the variable is used in
+    String  _value  the value of the constant
+    String  _code  the plain text code
   """
   def __init__(self):
     self._dataType = ""
@@ -801,6 +815,7 @@ class Constant:
   def getUsage(self):
       return self._usage
 
+
   """
   Function Name:
 
@@ -808,7 +823,7 @@ class Constant:
 
   Description:
 
-  	Prints out the Constant object to the command line
+  	Prints out the current instance of the Constant object to the command line for debugging
   """
   def toString(self):
     print("Name: " + self._name)
@@ -820,13 +835,14 @@ class Constant:
         print(function.name)
     print()
 
-  #Property Calls
   dataType = property(getDataType, setDataType)
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   value = property(getValue, setValue)
   code = property(getCode, setCode)
   usage = property(getUsage)
+
+
 
 """
 ***************************************************************
@@ -836,28 +852,30 @@ CLASS NAME:
 
 DESCRIPTION:
 
-	Object repersenting a Function in the program
+	Object repersenting a Function
+
 ***************************************************************
 """
 class Function:
+
   """
   Function Name:
 
   	__init__
 
-  Description:
+	Description:
 
   	Constructor for Function
 
   Variables:
 
   	String  name  name of the function
-    String  description  description of the function
+    String  description  description of the function usage
     Variable[]  parameters  parameters of the function
     Variable  returnValue  return value of the function
 	Variable[]  variables  the global variables manipulated by the function
     Constant[] constants  the global constants referenced by the fucntion
-	Functions[]  functionCalls  functions called by the function
+	Functions[]  functionCalls  the functions the function calls
 	String  code  the plain text code of the function
   """
   def __init__(self):
@@ -949,7 +967,6 @@ class Function:
           print(function.name)
       print("========================================")
 
-  #Property Calls
   name = property(getName, setName)
   description = property(getDescription, setDescription)
   parameters = property(getParameters)
@@ -959,14 +976,15 @@ class Function:
   variables = property(getVariables)
   constants = property(getConstants)
 
+
 """
   Function Name:
 
   	exitMessage
 
-  Description:
+	Description:
 
-  	Prints specified message then exits program with specified exit code
+  	Prints specified message then exits program with specified exit code.
 
   Parameters:
 
@@ -982,27 +1000,51 @@ def exitMessage(message, code):
 
   	unformedSyntaxHandler
 
-  Description:
+    Description:
 
-  	Wrapper for exitMessage with an unformed syntax message including the offending line, exiting with code 1
+  	Wrapper for exitMessage with repeatedly used unformed syntax message
 """
 def unformedSyntaxHandler():
     exitMessage("Unformed syntax, please check line " + str(currentLineIndex), 1)
+
+"""
+Function Name:
+
+  	unformedSyntaxHandler
+
+Description:
+
+  	Wrapper for exitMessage with repeatedly used unformed syntax message
+
+"""
+def alphabetize(objectList):
+    index = 1
+    listLength = len(objectList)
+    while index < listLength
+        if objectList[index].name < objectList[index-1].name:
+            tempIndex = index
+            while objectList[tempIndex].name < objectList[tempIndex-1].name and tempIndex > 0:
+                temp = objectList[tempIndex-1]
+                objectList[tempIndex-1] = objectList[tempIndex]
+                objectList[tempIndex] = temp
+                tempIndex -= 1
+
+    return sortedList
+
 
 """
   Function Name:
 
   	findN
 
-  Description:
+	Description:
 
-  	Returns the index of the nth substring of input
+  	Returns the index of the nth substring of input.
 
   Parameters:
 
-  	String  s  the string to search
-    String  substr  the substring to search for
-    int  n  the nth occurrence to search for
+  	String  message  the message to print out
+    int  code  the exit code
 """
 def findN(s, substr, n):
     if n <= s.count(substr) and n > -1:
@@ -1018,7 +1060,7 @@ def findN(s, substr, n):
 
   	isVariableDeclaration
 
-  Description:
+	Description:
 
   	Checks if the given line is a variable declaration
 
@@ -1031,9 +1073,11 @@ def findN(s, substr, n):
   	boolean  isVariable  returns True if line contains variable declaration, returns False otherwise
 """
 def isVariableDeclaration(line):
-    for dataType in variableDeclarationTypes:
-        if re.search(" *" + dataType, line):
-            if re.search("//", line) and re.search(";", line):
+    for datatype in variableDeclarationTypes:
+        if line.startswith(datatype):
+            commentIndex = line.find("//")
+            semicolonIndex = line.find(';')
+            if semicolonIndex != -1 and (semicolonIndex < commentIndex or commentIndex == -1):
                 return True
             break
     return False
@@ -1043,7 +1087,7 @@ def isVariableDeclaration(line):
 
   	isConstantDeclaration
 
-  Description:
+	Description:
 
   	Checks if the given line is a constant declaration
 
@@ -1056,31 +1100,34 @@ def isVariableDeclaration(line):
   	boolean  isConstant  returns True if line contains constant declaration, returns False otherwise
 """
 def isConstantDeclaration(line):
-    if re.search("^.*#define", line):
+    if currentLine.startswith("#define"):
         return True
     return False
+
+
+
 
 """
     Function Name:
 
-      searchForChar
+    	searchForChar
 
     Description:
 
-      Searches left or right in a given String from a given index character by character
-      to find a character or the absence of a character, returning the index the feature is found at
+        Searches left or right in a given String from a given index character by character
+        to find a character or the absence of a character, returning the index the feature is found at
 
     Parameters:
 
-      String  string  the string to search for given character
-      char  char  the char to search for the presence or absence of
-      int  increment  the increment to change each time (1 to search left by 1, -1 to search right by 1)
-      int  startIndex  the index to start from while searching
-      bool  presence  if True the presence of the character will be searched for, if False the absence of the character will be searched for
+        String  string  the string to search for given character
+        char  char  the char to search for the presence or absence of
+        int  increment  the increment to change each time (1 to search left by 1, -1 to search right by 1)
+        int  startIndex  the index to start from while searching
+        bool  presence  if True the presence of the character will be searched for, if False the absence of the character will be searched for
 
     Returns:
 
-      int  index  the index the request is found at in the given String, if there is an error or the character is not found -1
+        int  index  the index the request is found at in the given String, if there is an error or the character is not found -1
 """
 def searchForChar(string, char, increment, startIndex, presence):
     if startIndex < 0 or startIndex >= len(string):
@@ -1103,9 +1150,9 @@ def searchForChar(string, char, increment, startIndex, presence):
 
   	isFunctionHeader
 
-  Description:
+	Description:
 
-  	Checks if the given line is the start of a function header
+  	Checks if the given line is the start of a function header by looking for "Function Name:"
 
   Parameters:
 
@@ -1125,7 +1172,7 @@ def isFunctionHeader(line):
 
   	isLibraryImport
 
-  Description:
+	Description:
 
   	Checks if the given line is a library import statement
 
@@ -1142,14 +1189,16 @@ def isLibraryImport(line):
         return True
     return False
 
+
 """
-    Function Name:
+Function Name:
 
-  	  skipBlankLine
+  	skipBlankLine
 
-    Description:
+Description:
 
-      Skips lines until it encounters a line that doens't contain solely asterisks, spaces, and new line characters or is the end of a group comment (*/)
+  	skips lines until it encounters a line that doens't contain solely asterisks, spaces, and new line characters
+
 """
 def skipBlankLine():
     global currentLineIndex
@@ -1162,21 +1211,22 @@ def skipBlankLine():
             return line
 
 """
-    Function Name:
+Function Name:
 
-  	  descriptionScraper
+  	descriptionScraper
 
-    Description:
+Description:
 
-  	  Scrapes the description section of a function header and sets fields of a Function object to harvested values
+  	Scrapes the description section of a function header after encountering the "Description:" header
 
-    Parameters:
+Parameters:
 
-	  Function  new_function  takes in a  function to set the harvested description to
+	Function  new_function  takes in a  function to set the harvested description to
 
-    Returns:
+Returns:
 
-	  String  line  return the last line read as it triggered an exit
+	String  line  return the last line read triggering exit
+
 """
 def descriptionScraper(new_function):
     description = ""
@@ -1189,29 +1239,28 @@ def descriptionScraper(new_function):
         else:
             description += re.search("([ *]*)([\w\[.!?\\\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*() <>]*[\w\[.!?\\-\]`~\{\}\"\'\;\:,\/=+@#$%^&*()<>])( *\n)",  line, re.I | re.U).group(2) + "\n"
         line = skipBlankLine()
-
-    #Remove last end of line character if present
     if description.endswith("\n"):
         description = description[:-1]
     new_function.description = description
     return line
 
 """
-    Function Name:
+Function Name:
 
-  	  parameterScraper
+  	parameterScraper
 
-    Description:
+Description:
 
-      Scrapes the parameters section of a function header and sets fields of a Function object to harvested values
+  	Scrapes the parameters section of a function header after encountering the "Parameter:" header
 
-    Parameters:
+Parameters:
 
-      Function  new_function  takes in a  function to store the harvested parameters in
+	Function  new_function  takes in a  function to store the harvested parameters in
 
-    Returns:
+Returns:
 
-      String  line  return the last return the last line read as it triggered an exit
+	String  line  return the last line read triggering exit
+
 """
 def parameterScraper(new_function):
 	line = skipBlankLine()
@@ -1238,7 +1287,7 @@ Function Name:
 
 Description:
 
-  	Scrapes the return section of a function header and sets fields of a Function object to harvested values
+  	Scrapes the return section of a function header after encountering the "Returns:" header
 
 Parameters:
 
@@ -1246,7 +1295,8 @@ Parameters:
 
 Returns:
 
-      String  line  return the last return the last line read as it triggered an exit
+	String  line  return the last line read triggering exit
+
 """
 def returnScraper(new_function):
 	line = skipBlankLine()
@@ -1272,28 +1322,29 @@ def returnScraper(new_function):
 
   Description:
 
-  	Harvests function declaration and its header into a function object then appended the created object to the global list of functions documentedFunctions
+  	Harvests function declaration and its header into a function object form then appends to global list of functions
+
 """
 def harvestFunction():
 	global currentLineIndex
 	new_function = Function()
-	#Keep going until we find a non-blank line (has the function name)
+	#keep going until we find a non-blank line (has the function name)
 	line = skipBlankLine()
 
 	if re.search("^.*Description: *\n", line):
 		unformedSyntaxHandler()
 
-	#Harvest function name from line
+	#harvest function name from line
 	new_function.name = re.sub("(\W)", "",  line)
-	#Keep going until we encounter another field, (description field)
+	#keep going until we encounter another field, (description field)
 	line = skipBlankLine()
 
 
-	#Check if field is description field
+	#check if field is description field
 	if re.search("^.*Description: *\n", line):
 		line = descriptionScraper(new_function)
 	else:
-		#Couldn't find description header
+		#couldn't find description header
 		unformedSyntaxHandler()
 
 	headingsHarvestedCount = 0
@@ -1307,11 +1358,10 @@ def harvestFunction():
 			line = skipBlankLine()
 			headingsHarvestedCount -= 1
 		elif re.search("(\*\/)", line):
-			#Done harvesting the function header
+			#done harvesting the function header
 			break
 		headingsHarvestedCount += 1
 
-    #Confirm end of header was found
 	if not re.search("(\*\/)", line):
 		line = skipBlankLine()
 		if not re.search("(\*\/)", line):
@@ -1321,7 +1371,6 @@ def harvestFunction():
 
 	code = ""
 
-    #Harvest plain-text code
 	opening_curly_count = line.count("{")
 	closing_curly_count = line.count("}")
 	code = line
@@ -1335,8 +1384,9 @@ def harvestFunction():
 
 	new_function.code = code
 
-    #Append the created Function object
 	documentedFunctions.append(new_function)
+
+
 
 """
   Function Name:
@@ -1345,7 +1395,7 @@ def harvestFunction():
 
   Description:
 
-  	Harvests a library import statement then appends the newly created object to documentedLibraries
+  	Harvests a library import statement then appends the newly created object to a global list
 
   Parameters:
 
@@ -1359,6 +1409,7 @@ def harvestLibraryImport(line):
     new_library.code = groups.group(1) + groups.group(2) + groups.group(3) + groups.group(4)
     documentedLibraries.append(new_library)
 
+
 """
   Function Name:
 
@@ -1366,7 +1417,7 @@ def harvestLibraryImport(line):
 
   Description:
 
-  	Analyzes the plain text code of the body of a function and creates links within objects
+  	Analyzes the plain text code of the body of a function and creates links to variables and other functions
 
   Parameters:
 
@@ -1390,6 +1441,7 @@ def analyzeFunctionBody(function_to_analyze):
             function_to_analyze.appendConstant(constant)
             constant.appendUsage(function_to_analyze)
 
+
 """
   Function Name:
 
@@ -1397,14 +1449,14 @@ def analyzeFunctionBody(function_to_analyze):
 
   Description:
 
-  	Harvests constant declaration into Constant object form then appends the newly created object to the documentedConstants list
+  	Harvests constant declaration into Variable object form then appends to global list of constants
 
   Parameters:
 
   	String  line  the line with the constant declaration to harvest
 """
 def harvestConstant(line):
-  #Create a new instance of a Constant object
+  #create new instance of Constant object
   new_constant = Constant()
 
   #collect indexes
@@ -1490,7 +1542,7 @@ def harvestConstant(line):
 
 	Description:
 
-  	Harvests variable declaration into Variable object form then appends to the object to documentedVariables
+  	Harvests variable declaration into Variable object form then appends to global list of variables
 
   Parameters:
 
@@ -1595,14 +1647,22 @@ def harvestVariable(line):
         String  htmlString  the html file string
 """
 def htmlHead(title, path):
-    htmlString = ""
-    htmlString += "<!DOCTYPE HTML>"
-    htmlString += "\n<html lang=\"en\">"
-    htmlString += "\n<head>"
-    htmlString += "\n<title>" + title + "</title>"
-    htmlString += "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-    htmlString += "\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + path + "\\stylesheets\stylesheet.css\" title=\"Style\">"
-    htmlString += "\n<head>"
+    htmlString = (""
+                    "<!DOCTYPE HTML>"
+                    "\n<html lang=\"en\">"
+                    "\n<head>"
+                    "\n<title>" + title + "</title>"
+                    "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+                    "\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + path + "\\stylesheets\stylesheet.css\" title=\"Style\">"
+                    "\n<head>"
+                    )
+    # htmlString += "<!DOCTYPE HTML>"
+    # htmlString += "\n<html lang=\"en\">"
+    # htmlString += "\n<head>"
+    # htmlString += "\n<title>" + title + "</title>"
+    # htmlString += "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+    # htmlString += "\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + path + "\\stylesheets\stylesheet.css\" title=\"Style\">"
+    # htmlString += "\n<head>"
     return htmlString
 
 
@@ -1624,12 +1684,18 @@ def htmlHead(title, path):
         String  htmlString  the html file string
 """
 def htmlNavBar(highlighted_link):
-    htmlString = ""
-    htmlString += "\n<header>"
-    htmlString += "\n<nav>"
-    htmlString += "<div class=\"topNav\">"
-    htmlString += "<a id=\"navbar.top\"></a>"
-    htmlString += "\n<ul class=\"navList\" title=\"Navigation\">"
+    htmlString = (""
+                "\n<header>"
+                "\n<nav>"
+                "<div class=\"topNav\">"
+                "<a id=\"navbar.top\"></a>"
+                "\n<ul class=\"navList\" title=\"Navigation\">"
+                )
+    # htmlString += "\n<header>"
+    # htmlString += "\n<nav>"
+    # htmlString += "<div class=\"topNav\">"
+    # htmlString += "<a id=\"navbar.top\"></a>"
+    # htmlString += "\n<ul class=\"navList\" title=\"Navigation\">"
 
     if highlighted_link != "Home":
         htmlString += "\n<li><a href=\"../home.html\">Home</a></li>"
@@ -1667,11 +1733,11 @@ def htmlNavBar(highlighted_link):
 
     Description:
 
-  	    Returns a String contaning a function summary in HTML
+  	    Returns a String contaning the function summary of a function file in HTML
 
     Parameter:
 
-        Function  in_function  the function to turn into a HTML function summary
+        Function  in_function  the function to create the HTML for a function summary for
 
     Returns:
 
@@ -1682,70 +1748,120 @@ def htmlFunctionSummary(in_function):
     htmlString = ""
 
     if in_function.description != "" or len(in_function.parameters) >= 1 or in_function.returnValue != None:
-        htmlString += "\n<div class=\"details\">"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<section>"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<li class=\"blockList\">"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<h3>Function Summary</h3>"
-        htmlString += "\n<a id=\"whitespace\"></a>"
+        htmlString += ("\n<div class=\"details\">"
+                        "\n<ul class=\"blockList\">"
+                        "\n<section>"
+                        "\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<h3>Function Summary</h3>"
+                        "\n<a id=\"whitespace\"></a>"
+                        )
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<section>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<li class=\"blockList\">"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<h3>Function Summary</h3>"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
 
         if in_function.description != "":
-            htmlString += "\n<ul class=\"blockList\">"
-            htmlString += "\n<li class=\"blockList\">"
-            htmlString += "\n<h4>Description</h4>"
-            htmlString += "\n<div class=\"block\">" + in_function.description.replace("\n", "<br \/>") + "</div>"
+            htmlString += ("\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<h4>Description</h4>"
+                        "\n<div class=\"block\">" + in_function.description.replace("\n", "<br \/>") + "</div>"
+                        )
+            # htmlString += "\n<li class=\"blockList\">"
+            # htmlString += "\n<h4>Description</h4>"
+            # htmlString += "\n<div class=\"block\">" + in_function.description.replace("\n", "<br \/>") + "</div>"
 
         htmlString += "\n</li>"
 
         if len(in_function.parameters) >= 1:
-            htmlString += "\n<table class=\"memberSummary\">"
-            htmlString += "\n<caption><span>Parameters</span><span class=\"tabEnd\">&nbsp;</span></caption>"
-            htmlString += "\n<tr>"
-            htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
-            htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
-            htmlString += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
-            htmlString += "</tr>"
-            htmlString += "<tr id=\"i0\" class=\"altColor\">"
+            htmlString += ("\n<table class=\"memberSummary\">"
+                        "\n<caption><span>Parameters</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+                        "\n<tr>"
+                        "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+                        "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+                        "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+                        "</tr>"
+                        "<tr id=\"i0\" class=\"altColor\">"
+                        )
+            # htmlString += "\n<caption><span>Parameters</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+            # htmlString += "\n<tr>"
+            # htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+            # htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+            # htmlString += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+            # htmlString += "</tr>"
+            # htmlString += "<tr id=\"i0\" class=\"altColor\">"
 
 
             for parameter in in_function.parameters:
-                htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
-                htmlString += "\n<td class=\"colFirst\"><code>" + "*" * parameter.pointer_depth + parameter.dataType + "</code></td>"
-                htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + parameter.name + "</code></th>"
-                htmlString += "\n<td class=\"colLast\">"
-                htmlString += "\n<div class=\"block\">" + parameter.description.replace("\n", " ") + "</div>"
-                htmlString += "\n</td>"
-                htmlString += "\n</tr>"
+                htmlString += ("\n<tr id=\"i0\" class=\"altColor\">"
+                            "\n<td class=\"colFirst\"><code>" + "*" * parameter.pointer_depth + parameter.dataType + "</code></td>"
+                            "\n<th class=\"colSecond\" scope=\"row\"><code>" + parameter.name + "</code></th>"
+                            "\n<td class=\"colLast\">"
+                            "\n<div class=\"block\">" + parameter.description.replace("\n", " ") + "</div>"
+                            "\n</td>"
+                            "\n</tr>"
+                            )
+                # htmlString += "\n<td class=\"colFirst\"><code>" + "*" * parameter.pointer_depth + parameter.dataType + "</code></td>"
+                # htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + parameter.name + "</code></th>"
+                # htmlString += "\n<td class=\"colLast\">"
+                # htmlString += "\n<div class=\"block\">" + parameter.description.replace("\n", " ") + "</div>"
+                # htmlString += "\n</td>"
+                # htmlString += "\n</tr>"
 
             htmlString += "\n</table>"
 
         if in_function.returnValue != None:
-            htmlString += "\n<a id=\"whitespace\"></a>"
-            htmlString += "\n<table class=\"memberSummary\">"
-            htmlString += "<caption><span>Returns</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
-            htmlString += "\n<tr>"
-            htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
-            htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
-            htmlString += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
-            htmlString += "\n</tr>"
-            htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
-            htmlString += "\n<td class=\"colFirst\"><code>" + "*" * in_function.returnValue.pointer_depth + in_function.returnValue.dataType + "</code></td>"
-            htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_function.returnValue.name + "</code></th>"
-            htmlString += "\n<td class=\"colLast\">"
-            htmlString += "\n<div class=\"block\">" + in_function.returnValue.description + "</div>"
-            htmlString += "\n</td>"
-            htmlString += "\n</tr>"
-            htmlString += "\n</table>"
+            htmlString += ("\n<a id=\"whitespace\"></a>"
+                        "\n<table class=\"memberSummary\">"
+                        "<caption><span>Returns</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
+                        "\n<tr>"
+                        "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+                        "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+                        "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+                        "\n</tr>"
+                        "\n<tr id=\"i0\" class=\"altColor\">"
+                        "\n<td class=\"colFirst\"><code>" + "*" * in_function.returnValue.pointer_depth + in_function.returnValue.dataType + "</code></td>"
+                        "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_function.returnValue.name + "</code></th>"
+                        "\n<td class=\"colLast\">"
+                        "\n<div class=\"block\">" + in_function.returnValue.description + "</div>"
+                        "\n</td>"
+                        "\n</tr>"
+                        "\n</table>"
+                        )
+            # htmlString += "\n<table class=\"memberSummary\">"
+            # htmlString += "<caption><span>Returns</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
+            # htmlString += "\n<tr>"
+            # htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+            # htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+            # htmlString += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+            # htmlString += "\n</tr>"
+            # htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
+            # htmlString += "\n<td class=\"colFirst\"><code>" + "*" * in_function.returnValue.pointer_depth + in_function.returnValue.dataType + "</code></td>"
+            # htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_function.returnValue.name + "</code></th>"
+            # htmlString += "\n<td class=\"colLast\">"
+            # htmlString += "\n<div class=\"block\">" + in_function.returnValue.description + "</div>"
+            # htmlString += "\n</td>"
+            # htmlString += "\n</tr>"
+            # htmlString += "\n</table>"
 
-        htmlString += "\n</section>"
-        htmlString += "\n</li>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</li>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</div>"
+        htmlString += ("\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</ul>"
+                    "\n</div>"
+                    )
+        # htmlString += "\n</li>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</li>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</div>"
 
     return htmlString
 
@@ -1757,11 +1873,11 @@ def htmlFunctionSummary(in_function):
 
     Description:
 
-  	    Returns a String contaning the variable summary of a variable page in HTML
+  	    Returns a String contaning the variable summary of a variable file in HTML
 
     Parameter:
 
-        Variable  in_variable  the variable to turn into a HTML variable summary
+        Variable  in_variable  the variable to create the HTML for a variable summary
 
     Returns:
 
@@ -1769,47 +1885,89 @@ def htmlFunctionSummary(in_function):
 """
 def htmlVariableSummary(in_variable):
 
-    htmlString = ""
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Variable Summary</h3>"
+                "\n<a id=\"whitespace\"></a>"
 
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Variable Summary</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
 
-    htmlString += "\n<ul v class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>Description</h4>"
-    htmlString += "\n<div class=\"block\">" + in_variable.description.replace("\n", "<br \/>") + "</div>"
-    htmlString += "\n</li>"
+                "\n<ul v class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>Description</h4>"
+                "\n<div class=\"block\">" + in_variable.description.replace("\n", "<br \/>") + "</div>"
+                "\n</li>"
 
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<table class=\"memberSummary\">"
-    htmlString += "<caption><span>Fields</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
-    htmlString += "\n<tr>"
-    htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
-    htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
-    htmlString += "\n<th class=\"colLast\" scope=\"col\">Inital Value</th>"
-    htmlString += "\n</tr>"
-    htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
-    htmlString += "\n<td class=\"colFirst\"><code>" + "*" * in_variable.pointer_depth + in_variable.dataType + "</code></td>"
-    htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_variable.name + "</code></th>"
-    htmlString += "\n<td class=\"colLast\">"
-    htmlString += "\n<div class=\"block\">" + in_variable.inital_value + "</div>"
-    htmlString += "\n</td>"
-    htmlString += "\n</tr>"
-    htmlString += "\n</table>"
 
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<table class=\"memberSummary\">"
+                "<caption><span>Fields</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
+                "\n<tr>"
+                "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+                "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+                "\n<th class=\"colLast\" scope=\"col\">Inital Value</th>"
+                "\n</tr>"
+                "\n<tr id=\"i0\" class=\"altColor\">"
+                "\n<td class=\"colFirst\"><code>" + "*" * in_variable.pointer_depth + in_variable.dataType + "</code></td>"
+                "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_variable.name + "</code></th>"
+                "\n<td class=\"colLast\">"
+                "\n<div class=\"block\">" + in_variable.inital_value + "</div>"
+                "\n</td>"
+                "\n</tr>"
+                "\n</table>"
+
+
+                "\n</section>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
+                )
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Variable Summary</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    #
+    # htmlString += "\n<ul v class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>Description</h4>"
+    # htmlString += "\n<div class=\"block\">" + in_variable.description.replace("\n", "<br \/>") + "</div>"
+    # htmlString += "\n</li>"
+    #
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<table class=\"memberSummary\">"
+    # htmlString += "<caption><span>Fields</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
+    # htmlString += "\n<tr>"
+    # htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+    # htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+    # htmlString += "\n<th class=\"colLast\" scope=\"col\">Inital Value</th>"
+    # htmlString += "\n</tr>"
+    # htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
+    # htmlString += "\n<td class=\"colFirst\"><code>" + "*" * in_variable.pointer_depth + in_variable.dataType + "</code></td>"
+    # htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_variable.name + "</code></th>"
+    # htmlString += "\n<td class=\"colLast\">"
+    # htmlString += "\n<div class=\"block\">" + in_variable.inital_value + "</div>"
+    # htmlString += "\n</td>"
+    # htmlString += "\n</tr>"
+    # htmlString += "\n</table>"
+    #
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -1820,11 +1978,11 @@ def htmlVariableSummary(in_variable):
 
     Description:
 
-  	    Returns a String contaning the constant summary of a constant page in HTML
+  	    Returns a String contaning the constant summary of a constant file in HTML
 
     Parameter:
 
-        Constant  in_constant  the constant to turn into a HTML constat summary
+        Constant  in_constant  the variable to create the HTML for a variable summary
 
     Returns:
 
@@ -1832,47 +1990,89 @@ def htmlVariableSummary(in_variable):
 """
 def htmlConstantSummary(in_constant):
 
-    htmlString = ""
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Constant Summary</h3>"
+                "\n<a id=\"whitespace\"></a>"
 
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Constant Summary</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
 
-    htmlString += "\n<ul v class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>Description</h4>"
-    htmlString += "\n<div class=\"block\">" + in_constant.description.replace("\n", "<br \/>") + "</div>"
-    htmlString += "\n</li>"
+                "\n<ul v class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>Description</h4>"
+                "\n<div class=\"block\">" + in_constant.description.replace("\n", "<br \/>") + "</div>"
+                "\n</li>"
 
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<table class=\"memberSummary\">"
-    htmlString += "<caption><span>Fields</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
-    htmlString += "\n<tr>"
-    htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
-    htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
-    htmlString += "\n<th class=\"colLast\" scope=\"col\">Value</th>"
-    htmlString += "\n</tr>"
-    htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
-    htmlString += "\n<td class=\"colFirst\"><code>" + in_constant.dataType + "</code></td>"
-    htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_constant.name + "</code></th>"
-    htmlString += "\n<td class=\"colLast\">"
-    htmlString += "\n<div class=\"block\">" + in_constant.value + "</div>"
-    htmlString += "\n</td>"
-    htmlString += "\n</tr>"
-    htmlString += "\n</table>"
 
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<table class=\"memberSummary\">"
+                "<caption><span>Fields</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
+                "\n<tr>"
+                "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+                "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+                "\n<th class=\"colLast\" scope=\"col\">Value</th>"
+                "\n</tr>"
+                "\n<tr id=\"i0\" class=\"altColor\">"
+                "\n<td class=\"colFirst\"><code>" + in_constant.dataType + "</code></td>"
+                "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_constant.name + "</code></th>"
+                "\n<td class=\"colLast\">"
+                "\n<div class=\"block\">" + in_constant.value + "</div>"
+                "\n</td>"
+                "\n</tr>"
+                "\n</table>"
+
+
+                "\n</section>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
+                )
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Constant Summary</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    #
+    # htmlString += "\n<ul v class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>Description</h4>"
+    # htmlString += "\n<div class=\"block\">" + in_constant.description.replace("\n", "<br \/>") + "</div>"
+    # htmlString += "\n</li>"
+    #
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<table class=\"memberSummary\">"
+    # htmlString += "<caption><span>Fields</span><span class=\"tabEnd\"> &nbsp;</span></caption>"
+    # htmlString += "\n<tr>"
+    # htmlString += "\n<th class=\"colFirst\" scope=\"col\">Data Type</th>"
+    # htmlString += "\n<th class=\"colSecond\" scope=\"col\">Name</th>"
+    # htmlString += "\n<th class=\"colLast\" scope=\"col\">Value</th>"
+    # htmlString += "\n</tr>"
+    # htmlString += "\n<tr id=\"i0\" class=\"altColor\">"
+    # htmlString += "\n<td class=\"colFirst\"><code>" + in_constant.dataType + "</code></td>"
+    # htmlString += "\n<th class=\"colSecond\" scope=\"row\"><code>" + in_constant.name + "</code></th>"
+    # htmlString += "\n<td class=\"colLast\">"
+    # htmlString += "\n<div class=\"block\">" + in_constant.value + "</div>"
+    # htmlString += "\n</td>"
+    # htmlString += "\n</tr>"
+    # htmlString += "\n</table>"
+    #
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -1883,11 +2083,11 @@ def htmlConstantSummary(in_constant):
 
     Description:
 
-  	    Returns a String contaning a HTML library summary
+  	    Returns a String contaning the library summary of a constant file in HTML
 
     Parameter:
 
-        Library  in_library  the library to turn into a HTML library summary
+        Library  in_library  the library to create the HTML for a library summary
 
     Returns:
 
@@ -1895,30 +2095,55 @@ def htmlConstantSummary(in_constant):
 """
 def htmlLibrarySummary(in_library):
 
-    htmlString = ""
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Library Summary</h3>"
+                "\n<a id=\"whitespace\"></a>"
 
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Library Summary</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
 
-    htmlString += "\n<ul v class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>Description</h4>"
-    htmlString += "\n<div class=\"block\">" + in_library.description.replace("\n", "<br \/>") + "</div>"
-    htmlString += "\n</li>"
+                "\n<ul v class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>Description</h4>"
+                "\n<div class=\"block\">" + in_library.description.replace("\n", "<br \/>") + "</div>"
+                "\n</li>"
 
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+
+                "\n</section>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
+                )
+
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Library Summary</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    #
+    # htmlString += "\n<ul v class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>Description</h4>"
+    # htmlString += "\n<div class=\"block\">" + in_library.description.replace("\n", "<br \/>") + "</div>"
+    # htmlString += "\n</li>"
+    #
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -1943,19 +2168,29 @@ def htmlFunctionReferences(in_function):
     htmlString = ""
 
     if len(in_function.functionCalls) >= 1 or len(in_function.variables) >= 1 or len(in_function.constants) >= 1:
-        htmlString += "\n<div class=\"details\">"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<section>"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<li class=\"blockList\">"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<h3>References</h3>"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<ul class=\"blockList\">"
-        if len(in_function.functionCalls) >= 1:
-            htmlString += "\n<li class=\"blockList\">"
-            htmlString += "\n<h4>Referenced Functions</h4>"
+        htmlString += ("\n<div class=\"details\">"
+                        "\n<ul class=\"blockList\">"
+                        "\n<section>"
+                        "\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<h3>References</h3>"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<ul class=\"blockList\">"
+                        )
 
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<section>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<li class=\"blockList\">"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<h3>References</h3>"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        if len(in_function.functionCalls) >= 1:
+            htmlString += ("\n<li class=\"blockList\">"
+                            "\n<h4>Referenced Functions</h4>"
+                            )
             buildString = ""
 
             firstFlag = True
@@ -1972,9 +2207,9 @@ def htmlFunctionReferences(in_function):
             htmlString += "\n</li>"
 
         if len(in_function.variables) >= 1:
-            htmlString += "\n<li class=\"blockList\">"
-            htmlString += "\n<h4>Referenced Variables</h4>"
-
+            htmlString += ("\n<li class=\"blockList\">"
+                            "\n<h4>Referenced Variables</h4>"
+                            )
             buildString = ""
 
             firstFlag = True
@@ -1992,8 +2227,9 @@ def htmlFunctionReferences(in_function):
             htmlString += "\n</li>"
 
         if len(in_function.constants) >= 1:
-            htmlString += "\n<li class=\"blockList\">"
-            htmlString += "\n<h4>Referenced Constants</h4>"
+            htmlString += ("\n<li class=\"blockList\">"
+                            "\n<h4>Referenced Constants</h4>"
+                            )
 
             buildString = ""
 
@@ -2010,14 +2246,23 @@ def htmlFunctionReferences(in_function):
             htmlString += "\n<code>" + buildString +  "</code>"
             htmlString += "\n</li>"
 
-        htmlString += "\n</section>"
+        htmlString += ("\n</section>"
 
-        htmlString += "\n</li>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
+                        "\n</li>"
+                        "\n</ul>"
+                        "\n</ul>"
+                        "\n</ul>"
 
-        htmlString += "\n</div>"
+                        "\n</div>"
+                        )
+
+        #
+        # htmlString += "\n</li>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        #
+        # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2043,18 +2288,30 @@ def htmlVariableReferences(in_variable):
     htmlString = ""
 
     if len(in_variable.usage) >= 1:
-        htmlString += "\n<div class=\"details\">"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<section>"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<li class=\"blockList\">"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<h3>Usage</h3>"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<ul class=\"blockList\">"
+        htmlString += ("\n<div class=\"details\">"
+                        "\n<ul class=\"blockList\">"
+                        "\n<section>"
+                        "\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<h3>Usage</h3>"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<h4>Usage in Functions</h4>"
+                        )
 
-        htmlString += "\n<li class=\"blockList\">"
-        htmlString += "\n<h4>Usage in Functions</h4>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<section>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<li class=\"blockList\">"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<h3>Usage</h3>"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        #
+        # htmlString += "\n<li class=\"blockList\">"
+        # htmlString += "\n<h4>Usage in Functions</h4>"
 
         buildString = ""
 
@@ -2067,18 +2324,27 @@ def htmlVariableReferences(in_variable):
             else:
                 buildString += ", <a href=\"../functions/" + function.name + ".html\">" + function.name + "</a>"
 
-        htmlString += "\n<code>" + buildString + "</code>"
+        htmlString += ("\n<code>" + buildString + "</code>"
+                        "\n</li>"
+                        "\n</section>"
+                        "\n</li>"
+                        "\n</ul>"
+                        "\n</ul>"
+                        "\n</ul>"
+                        "\n</div>"
+                        )
 
-        htmlString += "\n</li>"
 
-        htmlString += "\n</section>"
-
-        htmlString += "\n</li>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
-
-        htmlString += "\n</div>"
+        # htmlString += "\n</li>"
+        #
+        # htmlString += "\n</section>"
+        #
+        # htmlString += "\n</li>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        #
+        # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2103,18 +2369,30 @@ def htmlConstantReferences(in_constant):
     htmlString = ""
 
     if len(in_constant.usage) >= 1:
-        htmlString += "\n<div class=\"details\">"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<section>"
-        htmlString += "\n<ul class=\"blockList\">"
-        htmlString += "\n<li class=\"blockList\">"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<h3>Usage</h3>"
-        htmlString += "\n<a id=\"whitespace\"></a>"
-        htmlString += "\n<ul class=\"blockList\">"
+        htmlString += ("\n<div class=\"details\">"
+                        "\n<ul class=\"blockList\">"
+                        "\n<section>"
+                        "\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<h3>Usage</h3>"
+                        "\n<a id=\"whitespace\"></a>"
+                        "\n<ul class=\"blockList\">"
+                        "\n<li class=\"blockList\">"
+                        "\n<h4>Usage in Functions</h4>"
+                        )
 
-        htmlString += "\n<li class=\"blockList\">"
-        htmlString += "\n<h4>Usage in Functions</h4>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<section>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        # htmlString += "\n<li class=\"blockList\">"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<h3>Usage</h3>"
+        # htmlString += "\n<a id=\"whitespace\"></a>"
+        # htmlString += "\n<ul class=\"blockList\">"
+        #
+        # htmlString += "\n<li class=\"blockList\">"
+        # htmlString += "\n<h4>Usage in Functions</h4>"
 
         buildString = ""
 
@@ -2127,18 +2405,28 @@ def htmlConstantReferences(in_constant):
             else:
                 buildString += ", <a href=\"../functions/" + function.name + ".html\">" + function.name + "</a>"
 
-        htmlString += "\n<code>" + buildString + "</code>"
+        htmlString += ("\n<code>" + buildString + "</code>"
+                    "\n</li>"
 
-        htmlString += "\n</li>"
+                    "\n</section>"
 
-        htmlString += "\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</ul>"
+                    "\n</ul>"
 
-        htmlString += "\n</li>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
-        htmlString += "\n</ul>"
-
-        htmlString += "\n</div>"
+                    "\n</div>"
+                    )
+        # htmlString += "\n</li>"
+        #
+        # htmlString += "\n</section>"
+        #
+        # htmlString += "\n</li>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        # htmlString += "\n</ul>"
+        #
+        # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2160,19 +2448,33 @@ def htmlConstantReferences(in_constant):
         String  htmlString  the html file string
 """
 def htmlFunctionBody(in_function):
-    htmlString = ""
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Function Body</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<ul class=\"blockListLast\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>" + in_function.name + "</h4>"
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Function Body</h3>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<ul class=\"blockListLast\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>" + in_function.name + "</h4>"
+                )
+
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Function Body</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<ul class=\"blockListLast\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>" + in_function.name + "</h4>"
     codeString = in_function.code
     newLineFlag = False
     buildCodeString = ""
@@ -2186,15 +2488,24 @@ def htmlFunctionBody(in_function):
             newLineFlag = False
             buildCodeString += letter
 
-    htmlString += "\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+    htmlString += ("\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</div>"
+                    )
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2216,19 +2527,32 @@ def htmlFunctionBody(in_function):
         String  htmlString  the html file string
 """
 def htmlVariableBody(in_variable):
-    htmlString = ""
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Variable Declaration</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<ul class=\"blockListLast\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>" + in_variable.name + "</h4>"
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Variable Declaration</h3>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<ul class=\"blockListLast\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>" + in_variable.name + "</h4>"
+                )
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Variable Declaration</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<ul class=\"blockListLast\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>" + in_variable.name + "</h4>"
     codeString = in_variable.code
     newLineFlag = False
     buildCodeString = ""
@@ -2242,15 +2566,24 @@ def htmlVariableBody(in_variable):
             newLineFlag = False
             buildCodeString += letter
 
-    htmlString += "\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+    htmlString += ("\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</div>"
+                    )
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2272,19 +2605,32 @@ def htmlVariableBody(in_variable):
         String  htmlString  the html file string
 """
 def htmlConstantBody(in_constant):
-    htmlString = ""
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Constant Declaration</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<ul class=\"blockListLast\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>" + in_constant.name + "</h4>"
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Constant Declaration</h3>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<ul class=\"blockListLast\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>" + in_constant.name + "</h4>"
+                )
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Constant Declaration</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<ul class=\"blockListLast\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>" + in_constant.name + "</h4>"
     codeString = in_constant.code
     newLineFlag = False
     buildCodeString = ""
@@ -2298,15 +2644,24 @@ def htmlConstantBody(in_constant):
             newLineFlag = False
             buildCodeString += letter
 
-    htmlString += "\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+    htmlString += ("\n<pre class=\"methodSignature\">" + buildCodeString + "</pre>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</div>"
+                    )
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2328,19 +2683,32 @@ def htmlConstantBody(in_constant):
         String  htmlString  the html file string
 """
 def htmlLibraryBody(in_library):
-    htmlString = ""
-    htmlString += "\n<div class=\"details\">"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<section>"
-    htmlString += "\n<ul class=\"blockList\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<h3>Library Import Statement</h3>"
-    htmlString += "\n<a id=\"whitespace\"></a>"
-    htmlString += "\n<ul class=\"blockListLast\">"
-    htmlString += "\n<li class=\"blockList\">"
-    htmlString += "\n<h4>" + in_library.name + "</h4>"
+    htmlString = (""
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Library Import Statement</h3>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<ul class=\"blockListLast\">"
+                "\n<li class=\"blockList\">"
+                "\n<h4>" + in_library.name + "</h4>"
+                )
+    # htmlString += "\n<div class=\"details\">"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<section>"
+    # htmlString += "\n<ul class=\"blockList\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<h3>Library Import Statement</h3>"
+    # htmlString += "\n<a id=\"whitespace\"></a>"
+    # htmlString += "\n<ul class=\"blockListLast\">"
+    # htmlString += "\n<li class=\"blockList\">"
+    # htmlString += "\n<h4>" + in_library.name + "</h4>"
     codeString = in_library.code
     newLineFlag = False
     buildCodeString = ""
@@ -2354,15 +2722,24 @@ def htmlLibraryBody(in_library):
             newLineFlag = False
             buildCodeString += letter
 
-    htmlString += "\n<pre class=\"methodSignature\">" + buildCodeString.replace(">", "&gt;").replace("<", "&lt;") + "</pre>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</section>"
-    htmlString += "\n</li>"
-    htmlString += "\n</ul>"
-    htmlString += "\n</div>"
+    htmlString += ("\n<pre class=\"methodSignature\">" + buildCodeString.replace(">", "&gt;").replace("<", "&lt;") + "</pre>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</div>"
+                    )
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</section>"
+    # htmlString += "\n</li>"
+    # htmlString += "\n</ul>"
+    # htmlString += "\n</div>"
 
     return htmlString
 
@@ -2382,25 +2759,45 @@ Parameters:
 
 """
 def functionToHTML(function):
-    fileHTML = htmlHead(function.name, "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Function Name\" class=\"title\">" + function.name + "</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += htmlFunctionSummary(function)
-    fileHTML += htmlFunctionReferences(function)
-    fileHTML += htmlFunctionBody(function)
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    fileHTML = (htmlHead(variable.name, "..") +
+                    "\n<body>" +
+                    htmlNavBar("") +
+                    "\n<main>"
+                    "\n<div class=\"header\">"
+                    "\n<a id=\"whitespace\"></a>"
+                    "\n<h2 title=\"Variable Name\" class=\"title\">" + variable.name + "</h2>"
+                    "\n</div>"
+                    "\n<div class=\"contentContainer\">"
+                    "\n<div class=\"description\">"
+                    "\n</ul>"
+                    "\n</div>" +
+                    htmlFunctionSummary(function) +
+                    htmlFunctionReferences(function) +
+                    htmlFunctionBody(function) +
+                    "\n</div>"
+                    "\n</main>"
+                    "\n</body>"
+                    "\n</html>"
+                    )
+
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Function Name\" class=\"title\">" + function.name + "</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += htmlFunctionSummary(function)
+    # fileHTML += htmlFunctionReferences(function)
+    # fileHTML += htmlFunctionBody(function)
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/functions/" + function.name + ".html", "w")
     htmlFile.write(fileHTML)
@@ -2421,25 +2818,44 @@ Parameters:
 
 """
 def variableToHTML(variable):
-    fileHTML = htmlHead(variable.name, "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Variable Name\" class=\"title\">" + variable.name + "</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += htmlVariableSummary(variable)
-    fileHTML += htmlVariableReferences(variable)
-    fileHTML += htmlVariableBody(variable)
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    fileHTML = (htmlHead(variable.name, "..") +
+                "\n<body>" +
+                htmlNavBar("") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Variable Name\" class=\"title\">" + variable.name + "</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>" +
+                htmlVariableSummary(variable) +
+                htmlVariableReferences(variable) +
+                htmlVariableBody(variable) +
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Variable Name\" class=\"title\">" + variable.name + "</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += htmlVariableSummary(variable)
+    # fileHTML += htmlVariableReferences(variable)
+    # fileHTML += htmlVariableBody(variable)
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/variables/" + variable.name + ".html", "w")
     htmlFile.write(fileHTML)
@@ -2460,25 +2876,44 @@ Parameters:
 
 """
 def constantToHTML(constant):
-    fileHTML = htmlHead(constant.name, "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Constant Name\" class=\"title\">" + constant.name + "</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += htmlConstantSummary(constant)
-    fileHTML += htmlConstantReferences(constant)
-    fileHTML += htmlConstantBody(constant)
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    fileHTML = (htmlHead(constant.name, "..") +
+                "\n<body>" +
+                htmlNavBar("") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Constant Name\" class=\"title\">" + constant.name + "</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>" +
+                htmlConstantSummary(constant) +
+                htmlConstantReferences(constant) +
+                htmlConstantBody(constant) +
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Constant Name\" class=\"title\">" + constant.name + "</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += htmlConstantSummary(constant)
+    # fileHTML += htmlConstantReferences(constant)
+    # fileHTML += htmlConstantBody(constant)
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/constants/" + constant.name + ".html", "w")
     htmlFile.write(fileHTML)
@@ -2499,24 +2934,43 @@ Parameters:
 
 """
 def libraryToHTML(library):
-    fileHTML = htmlHead(library.name, "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Library Name\" class=\"title\">" + library.name.replace(">", "&gt;").replace("<", "&lt;") + "</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += htmlLibrarySummary(library)
-    fileHTML += htmlLibraryBody(library)
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    fileHTML = (htmlHead(library.name, "..") +
+                "\n<body>" +
+                htmlNavBar("") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Library Name\" class=\"title\">" + library.name.replace(">", "&gt;").replace("<", "&lt;") + "</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>" +
+                htmlLibrarySummary(library) +
+                htmlLibraryBody(library) +
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
+
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Library Name\" class=\"title\">" + library.name.replace(">", "&gt;").replace("<", "&lt;") + "</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += htmlLibrarySummary(library)
+    # fileHTML += htmlLibraryBody(library)
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/libraries/" + library.name.replace(">", "").replace("<", "") + ".html", "w")
     htmlFile.write(fileHTML)
@@ -2609,7 +3063,7 @@ Function Name:
 
 Description:
 
-    Writes out the HTML for creating indexs under the indexes directory of generated documentation
+    Writes out the HTML for creating indexes under the indexes directory of generated documentation
 
 """
 def writeIndexHTML():
@@ -2628,68 +3082,120 @@ Description:
   	Creates the HTML for the function index page
 """
 def functionsIndexHTML():
-    fileHTML = htmlHead("Function Index", "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("Functions")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Function Index Header\" class=\"title\">Function Index</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"details\">"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<section>"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<li class=\"blockList\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h3>Functions</h3>"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML = (htmlHead("Function Index", "..") +
+                "\n<body>" +
+                htmlNavBar("Functions") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Function Index Header\" class=\"title\">Function Index</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>"
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Functions</h3>"
+                "\n<a id=\"whitespace\"></a>"
+               )
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("Functions")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Function Index Header\" class=\"title\">Function Index</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"details\">"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<section>"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<li class=\"blockList\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h3>Functions</h3>"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
 
     if len(documentedFunctions) >= 1:
-        fileHTML += "\n<table class=\"memberSummary\">"
-        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
-        fileHTML += "\n<tr>"
-        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Parameter Count</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Return Type</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Functions Called</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Global Variables Manipulated</th>"
-        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Constants Referenced</th>"
-        fileHTML += "</tr>"
-        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+        fileHTML += ("\n<table class=\"memberSummary\">"
+                    "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+                    "\n<tr>"
+                    "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Parameter Count</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Return Type</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Functions Called</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Global Variables Manipulated</th>"
+                    "\n<th class=\"colLast\" scope=\"col\">Constants Referenced</th>"
+                    "</tr>"
+                    "<tr id=\"i0\" class=\"altColor\">"
+                    )
+
+        # fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        # fileHTML += "\n<tr>"
+        # fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Parameter Count</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Return Type</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Functions Called</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Global Variables Manipulated</th>"
+        # fileHTML += "\n<th class=\"colLast\" scope=\"col\">Constants Referenced</th>"
+        # fileHTML += "</tr>"
+        # fileHTML += "<tr id=\"i0\" class=\"altColor\">"
 
 
         for function in documentedFunctions:
-            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
-            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../functions/" + function.name + ".html\">" + function.name + "</a></code></td>"
-            fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.parameters)) + "</code></div></td>"
+            fileHTML += ("\n<tr id=\"i0\" class=\"altColor\">"
+                        "\n<td class=\"colFirst\"><code><a href=\"../functions/" + function.name + ".html\">" + function.name + "</a></code></td>"
+                        "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.parameters)) + "</code></div></td>"
+                        )
+            # fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../functions/" + function.name + ".html\">" + function.name + "</a></code></td>"
+            # fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.parameters)) + "</code></div></td>"
             if function.returnValue != None:
                 fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + function.returnValue.pointer_depth * "*" + function.returnValue.dataType + "</code></th>"
+
             else:
                 fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>void</code></th>"
-            fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.functionCalls)) + "</code></div></td>"
-            fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.variables)) + "</code></div></td>"
-            fileHTML += "\n<td class=\"colLast\"><div class=\"block\"><code>" + str(len(function.constants)) + "</code></div></td>"
-            fileHTML += "\n</tr>"
+
+            fileHTML += ("\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.functionCalls)) + "</code></div></td>"
+                        "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.variables)) + "</code></div></td>"
+                        "\n<td class=\"colLast\"><div class=\"block\"><code>" + str(len(function.constants)) + "</code></div></td>"
+                        "\n</tr>"
+                        )
+            # fileHTML += "\n<td class=\"colSecond\"><div class=\"block\"><code>" + str(len(function.variables)) + "</code></div></td>"
+            # fileHTML += "\n<td class=\"colLast\"><div class=\"block\"><code>" + str(len(function.constants)) + "</code></div></td>"
+            # fileHTML += "\n</tr>"
 
         fileHTML += "\n</table>"
 
-    fileHTML += "\n</section>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    fileHTML += ("\n</section>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    #
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/indexes/functionsIndex.html", "w")
     htmlFile.write(fileHTML)
@@ -2705,63 +3211,113 @@ Description:
   	Creates the HTML for the variable index page
 """
 def variablesIndexHTML():
-    fileHTML = htmlHead("Variable Index", "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("Variables")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Variable Index Header\" class=\"title\">Variable Index</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"details\">"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<section>"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<li class=\"blockList\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h3>Variables</h3>"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML = (htmlHead("Variable Index", "..") +
+                "\n<body>" +
+                htmlNavBar("Variables") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Variable Index Header\" class=\"title\">Variable Index</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>"
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Variables</h3>"
+                "\n<a id=\"whitespace\"></a>"
+               )
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("Variables")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Variable Index Header\" class=\"title\">Variable Index</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"details\">"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<section>"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<li class=\"blockList\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h3>Variables</h3>"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
 
     if len(documentedVariables) >= 1:
-        fileHTML += "\n<table class=\"memberSummary\">"
-        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
-        fileHTML += "\n<tr>"
-        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Data Type</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Inital Value</th>"
-        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
-        fileHTML += "</tr>"
-        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+        fileHTML += ("\n<table class=\"memberSummary\">"
+                    "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+                    "\n<tr>"
+                    "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Data Type</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Inital Value</th>"
+                    "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
+                    "</tr>"
+                    "<tr id=\"i0\" class=\"altColor\">"
+                    )
+
+        # fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        # fileHTML += "\n<tr>"
+        # fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Data Type</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Inital Value</th>"
+        # fileHTML += "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
+        # fileHTML += "</tr>"
+        # fileHTML += "<tr id=\"i0\" class=\"altColor\">"
 
 
         for variable in documentedVariables:
-            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
-            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../variables/" + variable.name + ".html\">" + variable.name + "</a></code></td>"
-            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.pointer_depth * "*" + variable.dataType + "</code></th>"
-            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.inital_value + "</code></th>"
-            fileHTML += "\n<td class=\"colLast\">"
-            fileHTML += "\n<div class=\"block\"><code>" + str(len(variable.usage)) + "</code></div>"
-            fileHTML += "\n</td>"
-            fileHTML += "\n</tr>"
+            fileHTML += ("\n<tr id=\"i0\" class=\"altColor\">"
+                        "\n<td class=\"colFirst\"><code><a href=\"../variables/" + variable.name + ".html\">" + variable.name + "</a></code></td>"
+                        "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.pointer_depth * "*" + variable.dataType + "</code></th>"
+                        "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.inital_value + "</code></th>"
+                        "\n<td class=\"colLast\">"
+                        "\n<div class=\"block\"><code>" + str(len(variable.usage)) + "</code></div>"
+                        "\n</td>"
+                        "\n</tr>"
+                        )
+            # fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../variables/" + variable.name + ".html\">" + variable.name + "</a></code></td>"
+            # fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.pointer_depth * "*" + variable.dataType + "</code></th>"
+            # fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + variable.inital_value + "</code></th>"
+            # fileHTML += "\n<td class=\"colLast\">"
+            # fileHTML += "\n<div class=\"block\"><code>" + str(len(variable.usage)) + "</code></div>"
+            # fileHTML += "\n</td>"
+            # fileHTML += "\n</tr>"
 
-        fileHTML += "\n</table>"
+        fileHTML += ("\n</table>"
+                    "\n</section>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</li>"
+                    "\n</ul>"
+                    "\n</ul>"
+                    "\n</div>"
+                    "\n</div>"
+                    "\n</main>"
+                    "\n</body>"
+                    "\n</html>"
+                    )
 
-    fileHTML += "\n</section>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    # fileHTML += "\n</section>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    #
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/indexes/variablesIndex.html", "w")
     htmlFile.write(fileHTML)
@@ -2777,63 +3333,114 @@ Description:
   	Creates the HTML for the constants index page
 """
 def constantsIndexHTML():
-    fileHTML = htmlHead("Constant Index", "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("Constants")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Constant Index Header\" class=\"title\">Constant Index</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"details\">"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<section>"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<li class=\"blockList\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h3>Constants</h3>"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML = (htmlHead("Constant Index", "..") +
+                "\n<body>" +
+                htmlNavBar("Constants") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Constant Index Header\" class=\"title\">Constant Index</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>"
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Constants</h3>"
+                "\n<a id=\"whitespace\"></a>"
+               )
+
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("Constants")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Constant Index Header\" class=\"title\">Constant Index</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"details\">"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<section>"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<li class=\"blockList\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h3>Constants</h3>"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
 
     if len(documentedConstants) >= 1:
-        fileHTML += "\n<table class=\"memberSummary\">"
-        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
-        fileHTML += "\n<tr>"
-        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
-        fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Value</th>"
-        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
-        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Assumed Data Type</th>"
-        fileHTML += "</tr>"
-        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+        fileHTML += ("\n<table class=\"memberSummary\">"
+                    "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+                    "\n<tr>"
+                    "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+                    "\n<th class=\"colSecond\" scope=\"col\">Value</th>"
+                    "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
+                    "\n<th class=\"colLast\" scope=\"col\">Assumed Data Type</th>"
+                    "</tr>"
+                    "<tr id=\"i0\" class=\"altColor\">"
+                    )
+
+        # fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        # fileHTML += "\n<tr>"
+        # fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Value</th>"
+        # fileHTML += "\n<th class=\"colLast\" scope=\"col\">Function Usage Count</th>"
+        # fileHTML += "\n<th class=\"colLast\" scope=\"col\">Assumed Data Type</th>"
+        # fileHTML += "</tr>"
+        # fileHTML += "<tr id=\"i0\" class=\"altColor\">"
 
 
         for constant in documentedConstants:
-            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
-            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../constants/" + constant.name + ".html\">" + constant.name + "</a></code></td>"
-            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + constant.value + "</code></th>"
-            fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + str(len(constant.usage)) + "</code></th>"
-            fileHTML += "\n<td class=\"colLast\">"
-            fileHTML += "\n<div class=\"block\">" + constant.dataType + "</div>"
-            fileHTML += "\n</td>"
-            fileHTML += "\n</tr>"
+            fileHTML += ("\n<tr id=\"i0\" class=\"altColor\">"
+                        "\n<td class=\"colFirst\"><code><a href=\"../constants/" + constant.name + ".html\">" + constant.name + "</a></code></td>"
+                        "\n<th class=\"colSecond\" scope=\"row\"><code>" + constant.value + "</code></th>"
+                        "\n<th class=\"colSecond\" scope=\"row\"><code>" + str(len(constant.usage)) + "</code></th>"
+                        "\n<td class=\"colLast\">"
+                        "\n<div class=\"block\">" + constant.dataType + "</div>"
+                        "\n</td>"
+                        "\n</tr>"
+                        )
+            # fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../constants/" + constant.name + ".html\">" + constant.name + "</a></code></td>"
+            # fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + constant.value + "</code></th>"
+            # fileHTML += "\n<th class=\"colSecond\" scope=\"row\"><code>" + str(len(constant.usage)) + "</code></th>"
+            # fileHTML += "\n<td class=\"colLast\">"
+            # fileHTML += "\n<div class=\"block\">" + constant.dataType + "</div>"
+            # fileHTML += "\n</td>"
+            # fileHTML += "\n</tr>"
 
         fileHTML += "\n</table>"
 
-    fileHTML += "\n</section>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
+    fileHTML += ("\n</section>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
 
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    #
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/indexes/constantsIndex.html", "w")
     htmlFile.write(fileHTML)
@@ -2849,59 +3456,108 @@ Description:
   	Creates the HTML for the libraries index page
 """
 def librariesIndexHTML():
-    fileHTML = htmlHead("Libraries Index", "..")
-    fileHTML += "\n<body>"
-    fileHTML += htmlNavBar("Libraries")
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Library Index Header\" class=\"title\">Library Index</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"details\">"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<section>"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<li class=\"blockList\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h3>Libraries</h3>"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
+    fileHTML = (htmlHead("Libraries Index", "..") +
+                "\n<body>" +
+                htmlNavBar("Libraries") +
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Library Index Header\" class=\"title\">Library Index</h2>"
+                "\n<div class=\"contentContainer\">"
+                "\n</div>"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>"
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h3>Libraries</h3>"
+                "\n<a id=\"whitespace\"></a>"
+                )
+
+    # fileHTML += "\n<body>"
+    # fileHTML += htmlNavBar("Libraries")
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Library Index Header\" class=\"title\">Library Index</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"details\">"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<section>"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<li class=\"blockList\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h3>Libraries</h3>"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
 
     if len(documentedLibraries) >= 1:
-        fileHTML += "\n<table class=\"memberSummary\">"
-        fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
-        fileHTML += "\n<tr>"
-        fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
-        fileHTML += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
-        fileHTML += "</tr>"
-        fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+        fileHTML += ("\n<table class=\"memberSummary\">"
+                    "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+                    "\n<tr>"
+                    "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+                    "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+                    "</tr>"
+                    "<tr id=\"i0\" class=\"altColor\">"
+                    )
+
+        # fileHTML += "\n<caption><span>Index</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+        # fileHTML += "\n<tr>"
+        # fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Name</th>"
+        # fileHTML += "\n<th class=\"colLast\" scope=\"col\">Description</th>"
+        # fileHTML += "</tr>"
+        # fileHTML += "<tr id=\"i0\" class=\"altColor\">"
 
 
         for library in documentedLibraries:
-            fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
-            fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../libraries/" + library.name.replace(">", "").replace("<", "") + ".html\">" + library.name.replace(">", "").replace("<", "") + "</a></code></td>"
-            fileHTML += "\n<td class=\"colLast\">"
-            fileHTML += "\n<div class=\"block\">" + library.description.replace("\n", "<br \/>") + "</div>"
-            fileHTML += "\n</td>"
-            fileHTML += "\n</tr>"
+            fileHTML += ("\n<tr id=\"i0\" class=\"altColor\">"
+                        "\n<td class=\"colFirst\"><code><a href=\"../libraries/" + library.name.replace(">", "").replace("<", "") + ".html\">" + library.name.replace(">", "").replace("<", "") + "</a></code></td>"
+                        "\n<td class=\"colLast\">"
+                        "\n<div class=\"block\">" + library.description.replace("\n", "<br \/>") + "</div>"
+                        "\n</td>"
+                        "\n</tr>"
+                        )
+            # fileHTML += "\n<td class=\"colFirst\"><code><a href=\"../libraries/" + library.name.replace(">", "").replace("<", "") + ".html\">" + library.name.replace(">", "").replace("<", "") + "</a></code></td>"
+            # fileHTML += "\n<td class=\"colLast\">"
+            # fileHTML += "\n<div class=\"block\">" + library.description.replace("\n", "<br \/>") + "</div>"
+            # fileHTML += "\n</td>"
+            # fileHTML += "\n</tr>"
 
         fileHTML += "\n</table>"
 
-    fileHTML += "\n</section>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
+    fileHTML += ("\n</section>"
+                "\n</li>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
 
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
+
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    #
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
 
     htmlFile = open("./" + noExtensionFileName + "/indexes/librariesIndex.html", "w")
     htmlFile.write(fileHTML)
@@ -2910,82 +3566,158 @@ def librariesIndexHTML():
 def writeHomeHTML():
     global currentLineIndex
     fileHTML = htmlHead("Home", ".")
-    fileHTML += "\n<body>"
-    fileHTML += "\n<body>"
-    fileHTML += "\n<header>"
-    fileHTML += "\n<nav>"
-    fileHTML += "<div class=\"topNav\">"
-    fileHTML += "<a id=\"navbar.top\"></a>"
-    fileHTML += "\n<ul class=\"navList\" title=\"Navigation\">"
+    fileHTML+= ("\n<body>"
+                "\n<body>"
+                "\n<header>"
+                "\n<nav>"
+                "<div class=\"topNav\">"
+                "<a id=\"navbar.top\"></a>"
+                "\n<ul class=\"navList\" title=\"Navigation\">"
 
-    fileHTML += "\n<li class=\"navBarCell1Rev\">Home</li>"
-    fileHTML += "\n<li><a href=\"./indexes/functionsIndex.html\">Functions</a></li>"
-    fileHTML += "\n<li><a href=\"./indexes/variablesIndex.html\">Variables</a></li>"
-    fileHTML += "\n<li><a href=\"./indexes/constantsIndex.html\">Constants</a></li>"
-    fileHTML += "\n<li><a href=\"./indexes/librariesIndex.html\">Libraries</a></li>"
-    fileHTML += "\n</header>"
+                "\n<li class=\"navBarCell1Rev\">Home</li>"
+                "\n<li><a href=\"./indexes/functionsIndex.html\">Functions</a></li>"
+                "\n<li><a href=\"./indexes/variablesIndex.html\">Variables</a></li>"
+                "\n<li><a href=\"./indexes/constantsIndex.html\">Constants</a></li>"
+                "\n<li><a href=\"./indexes/librariesIndex.html\">Libraries</a></li>"
+                "\n</header>"
+                "\n</header>"
 
-    fileHTML += "\n<main>"
-    fileHTML += "\n<div class=\"header\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h2 title=\"Homepage Header\" class=\"title\">" + path + "</h2>"
-    fileHTML += "\n</div>"
-    fileHTML += "\n<div class=\"contentContainer\">"
-    fileHTML += "\n<div class=\"description\">"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
+                "\n<main>"
+                "\n<div class=\"header\">"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<h2 title=\"Homepage Header\" class=\"title\">" + path + "</h2>"
+                "\n</div>"
+                "\n<div class=\"contentContainer\">"
+                "\n<div class=\"description\">"
+                "\n</ul>"
+                "\n</div>"
 
-    fileHTML += "\n<div class=\"details\">"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<section>"
-    fileHTML += "\n<ul class=\"blockList\">"
-    fileHTML += "\n<li class=\"blockList\">"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
-    fileHTML += "\n<h3>Program Overview</h3>"
-    fileHTML += "\n<a id=\"whitespace\"></a>"
+                "\n<div class=\"details\">"
+                "\n<ul class=\"blockList\">"
+                "\n<section>"
+                "\n<ul class=\"blockList\">"
+                "\n<li class=\"blockList\">"
+                "\n<a id=\"whitespace\"></a>"
 
+                "\n<h3>Program Overview</h3>"
+                "\n<a id=\"whitespace\"></a>"
+                "\n<table class=\"memberSummary\">"
+                "\n<caption><span>Size</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+                "\n<tr>"
+                "\n<th class=\"colFirst\" scope=\"col\">Functions</th>"
+                "\n<th class=\"colSecond\" scope=\"col\">Variables</th>"
+                "\n<th class=\"colSecond\" scope=\"col\">Constants</th>"
+                "\n<th class=\"colSecond\" scope=\"col\">Libraries</th>"
+                "\n<th class=\"colLast\" scope=\"col\">Lines</th>"
+                "</tr>"
+                "\n<tr id=\"i0\" class=\"altColor\">"
 
+                "\n<td class=\"colFirst\"><code>" + str(len(documentedFunctions)) + "</code></td>"
+                "\n<td class=\"colSecond\"><code>" + str(len(documentedVariables)) + "</code></td>"
+                "\n<td class=\"colSecond\"><code>" + str(len(documentedConstants)) + "</code></td>"
+                "\n<td class=\"colSecond\"><code>" + str(len(documentedLibraries)) + "</code></td>"
+                "\n<td class=\"colLast\">"
+                "\n<code>" + str(currentLineIndex) + "</code>"
 
-    fileHTML += "\n<table class=\"memberSummary\">"
-    fileHTML += "\n<caption><span>Size</span><span class=\"tabEnd\">&nbsp;</span></caption>"
-    fileHTML += "\n<tr>"
-    fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Functions</th>"
-    fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Variables</th>"
-    fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Constants</th>"
-    fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Libraries</th>"
-    fileHTML += "\n<th class=\"colLast\" scope=\"col\">Lines</th>"
-    fileHTML += "</tr>"
-    fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+                "\n<code>" + str(currentLineIndex) + "</code>"
+                "\n</td>"
+                "\n</tr>"
+                "\n</table>"
 
-    fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
-    fileHTML += "\n<td class=\"colFirst\"><code>" + str(len(documentedFunctions)) + "</code></td>"
-    fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedVariables)) + "</code></td>"
-    fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedConstants)) + "</code></td>"
-    fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedLibraries)) + "</code></td>"
-    fileHTML += "\n<td class=\"colLast\">"
-    fileHTML += "\n<code>" + str(currentLineIndex) + "</code>"
-    fileHTML += "\n</td>"
-    fileHTML += "\n</tr>"
+                "\n</section>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</li>"
+                "\n</ul>"
+                "\n</ul>"
+                "\n</div>"
 
-    fileHTML += "\n</table>"
-
-    fileHTML += "\n</section>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</li>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</ul>"
-    fileHTML += "\n</div>"
-
-    fileHTML += "\n</div>"
-    fileHTML += "\n</main>"
-    fileHTML += "\n</body>"
-    fileHTML += "\n</html>"
-
+                "\n</div>"
+                "\n</main>"
+                "\n</body>"
+                "\n</html>"
+                )
     htmlFile = open("./" + noExtensionFileName + "/home.html", "w")
     htmlFile.write(fileHTML)
     htmlFile.close()
 
+    # fileHTML += "\n<body>"
+    # fileHTML += "\n<body>"
+    # fileHTML += "\n<header>"
+    # fileHTML += "\n<nav>"
+    # fileHTML += "<div class=\"topNav\">"
+    # fileHTML += "<a id=\"navbar.top\"></a>"
+    # fileHTML += "\n<ul class=\"navList\" title=\"Navigation\">"
+    #
+    # fileHTML += "\n<li class=\"navBarCell1Rev\">Home</li>"
+    # fileHTML += "\n<li><a href=\"./indexes/functionsIndex.html\">Functions</a></li>"
+    # fileHTML += "\n<li><a href=\"./indexes/variablesIndex.html\">Variables</a></li>"
+    # fileHTML += "\n<li><a href=\"./indexes/constantsIndex.html\">Constants</a></li>"
+    # fileHTML += "\n<li><a href=\"./indexes/librariesIndex.html\">Libraries</a></li>"
+    # fileHTML += "\n</header>"
+    #
+    # fileHTML += "\n<main>"
+    # fileHTML += "\n<div class=\"header\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h2 title=\"Homepage Header\" class=\"title\">" + path + "</h2>"
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n<div class=\"contentContainer\">"
+    # fileHTML += "\n<div class=\"description\">"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    #
+    # fileHTML += "\n<div class=\"details\">"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<section>"
+    # fileHTML += "\n<ul class=\"blockList\">"
+    # fileHTML += "\n<li class=\"blockList\">"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    # fileHTML += "\n<h3>Program Overview</h3>"
+    # fileHTML += "\n<a id=\"whitespace\"></a>"
+    #
+    # fileHTML += "\n<table class=\"memberSummary\">"
+    # fileHTML += "\n<caption><span>Size</span><span class=\"tabEnd\">&nbsp;</span></caption>"
+    # fileHTML += "\n<tr>"
+    # fileHTML += "\n<th class=\"colFirst\" scope=\"col\">Functions</th>"
+    # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Variables</th>"
+    # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Constants</th>"
+    # fileHTML += "\n<th class=\"colSecond\" scope=\"col\">Libraries</th>"
+    # fileHTML += "\n<th class=\"colLast\" scope=\"col\">Lines</th>"
+    # fileHTML += "</tr>"
+    # fileHTML += "<tr id=\"i0\" class=\"altColor\">"
+    #
+    # fileHTML += "\n<tr id=\"i0\" class=\"altColor\">"
+    # fileHTML += "\n<td class=\"colFirst\"><code>" + str(len(documentedFunctions)) + "</code></td>"
+    # fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedVariables)) + "</code></td>"
+    # fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedConstants)) + "</code></td>"
+    # fileHTML += "\n<td class=\"colSecond\"><code>" + str(len(documentedLibraries)) + "</code></td>"
+    # fileHTML += "\n<td class=\"colLast\">"
+    # fileHTML += "\n<code>" + str(currentLineIndex) + "</code>"
+    # fileHTML += "\n</td>"
+    # fileHTML += "\n</tr>"
+    #
+    # fileHTML += "\n</table>"
+    #
+    # fileHTML += "\n</section>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</li>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</ul>"
+    # fileHTML += "\n</div>"
+    #
+    # fileHTML += "\n</div>"
+    # fileHTML += "\n</main>"
+    # fileHTML += "\n</body>"
+    # fileHTML += "\n</html>"
+    #
+    # htmlFile = open("./" + noExtensionFileName + "/home.html", "w")
+    # htmlFile.write(fileHTML)
+    # htmlFile.close()
+
+    htmlFile = open("./" + noExtensionFileName + "/home.html", "w")
+    htmlFile.write(fileHTML)
+    htmlFile.close()
 
 """
 ***************************************************************
@@ -3023,14 +3755,13 @@ try:
 except OSError:
   exitMessage("File not found\nDouble check your path was spelled correctly", 1)
 
+
 #go through the file line by line
-	#identify patterns that are indicative of documentation (function header being present) <- arrayofstrings = ["funcheader"]
-  	#pass to a pattern handler and read line by line until end of the pattern (if a function header is present, we keep getting information from it until we hit the */ or end of the header)
-    	#record any data in variables setup before loop
-    	#return back to looking for patterns
 while True:
 	currentLineIndex += 1
 	currentLine = file.readline()
+    # functions are called to identify patterns that are indicative of documentation.
+    # Harvest functions are then called to store the information.
 	if currentLine == "":
 		break
 	elif isFunctionHeader(currentLine):
@@ -3042,11 +3773,16 @@ while True:
 	elif isLibraryImport(currentLine):
 		harvestLibraryImport(currentLine)
 
+#when done accumulating documentation, links are created between functions and the functions/variables they contain
 for function in documentedFunctions:
     analyzeFunctionBody(function)
-
+#a directory is created to organize all the generated HTML files
 createDirectories()
+#a Style sheet is created for the generated HTML
 writeCSS()
+#Information stored in objects is converted to HTML
 dataToHTML()
+#indexes directory is populated with the indexes of generated documentaion HTML
 writeIndexHTML()
+#Home page for documentation is generated
 writeHomeHTML()
