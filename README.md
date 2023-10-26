@@ -20,7 +20,7 @@ Features
 
 ## Example Format
 
-Here's a snapshot of the expected format, for an Arduino C SDCard reader function:
+Here's a snapshot of the expected format, for an Arduino SDCard reader function:
 
 ```
 #define dataPointLimit 100 //the maximum amount of data points that can be analyzed at once
