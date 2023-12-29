@@ -1,20 +1,20 @@
-# SnakeDoc: Automated Java-Doc Style Documentation Generator for Arduino/C++ 📜🐍
+# SnakeDoc: Automated Java-Doc Style Documentation Generator for Arduino C
 
-SnakeDoc is a tool designed to generate Java-doc style website documentation for Arduino/C++ code. if your code comments follow a standardized format, SnakeDoc will generate comprehensive documentation for you.
+SnakeDoc is a tool designed to generate Java-doc style website documentation for Arduino C code. if your code comments follow a standardized format, SnakeDoc will generate comprehensive documentation for you.
 
 ## Features
 
-    Automated Generation: SnakeDoc will automatically generate documentation for yuour Arduion/C++ code provided it is properly commented.
+    Automated Generation: SnakeDoc will automatically generate documentation for yuour Arduion C code provided it is properly commented.
     Java-doc Style: Familiar Java-doc style documentation for developers acquainted with Java's documentation style.
 
 ## Prerequisites
 
-    Arduino/C++ codebase with comments in the SnakeDoc standardized format.
+    Arduino C codebase with comments in the SnakeDoc standardized format.
 
 ## Usage
 
     1. Clone the repository.
-    2. Run SnakeDoc on your Arduino/C++ project.
+    2. Run SnakeDoc on your Arduino C project.
     3. Navigate to the generated documentation website.
 
 ## Example Format
